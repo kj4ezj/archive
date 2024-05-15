@@ -1,5 +1,6 @@
 #!/bin/bash
 set -eo pipefail
+ARCHIVE_RSYNC_FLAGS_DEFAULT='-Ptv'
 export GIT_BRANCH=''  # populated by make install
 export GIT_ORIGIN=''  # populated by make install
 export GIT_VERSION='' # populated by make install
@@ -99,6 +100,9 @@ $ archive [OPTIONS] [FILENAME]
     ARCHIVE_ROTATION
         The default rotation for "Document Reader" to use when opening files.
 
+    ARCHIVE_RSYNC_FLAGS
+        The rsync options to use when archiving files.
+
     ARCHIVE_TARGET
         The destination directory for your files to be archived.
 
@@ -153,15 +157,15 @@ function ls-remote {
 # pull a file from the server
 function pull {
     if [[ -f "$2" ]]; then
-        ee "rsync -Ptv '$1' '$2_$(date '+%s')'"
+        ee "rsync $ARCHIVE_RSYNC_FLAGS '$1' '$2_$(date '+%s')'"
     else
-        ee "rsync -Ptv '$1' '$2'"
+        ee "rsync $ARCHIVE_RSYNC_FLAGS '$1' '$2'"
     fi
 }
 
 # push a file to the server
 function push {
-    ee "rsync -Ptv '$1' '$2'"
+    ee "rsync $ARCHIVE_RSYNC_FLAGS '$1' '$2'"
 }
 
 # set xreader view mode to "two-up (facing)"
@@ -212,6 +216,10 @@ REMOTE_DIR="$(echo "$ARCHIVE_TARGET" | cut -d ':' -f '2')/${SUB_DIR}"
 REMOTE_PATH="${REMOTE_DIR}/${FILENAME}"
 TARGET_DIR="${ARCHIVE_TARGET}/${SUB_DIR}"
 TARGET_PATH="${TARGET_DIR}/${FILENAME}"
+# parse rsync flags
+if [[ -z "$ARCHIVE_RSYNC_FLAGS" ]]; then
+    ARCHIVE_RSYNC_FLAGS="$ARCHIVE_RSYNC_FLAGS_DEFAULT"
+fi
 # test if the file exists
 if file-exists "$SERVER" "$REMOTE_PATH"; then
     log "File '$FILENAME' exists at '$TARGET_PATH'."
