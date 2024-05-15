@@ -186,7 +186,7 @@ for (( i=1; i <= $#; i++)); do
         ARCHIVE_VIEW_MODE='dual'
     elif [[ "$(echo "$ARG" | grep -icP '^(h|help|[?])$')" == '1' ]]; then
         log-help-and-exit
-    elif [[ "$(echo "$ARG" | grep -icP '^(license)$')" == '1' ]]; then
+    elif [[ "$(echo "$ARG" | grep -icP '^(l|license)$')" == '1' ]]; then
         log-license-and-exit
     elif [[ "$(echo "$ARG" | grep -icP '^(p|path)$')" == '1' ]]; then
         i="$(( i+1 ))"
