@@ -5,6 +5,7 @@
   "homepage": "https://github.com/kj4ezj/archive",
   "author": "Zach Butler <kj4ezj+archive.sh@pm.me>",
   "license": "MIT",
+  "global": "true",
   "scripts": [
     "archive.sh"
   ],
