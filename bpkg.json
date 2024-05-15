@@ -13,5 +13,8 @@
   ],
   "dependencies": {
     "kj4ezj/ee": "main"
+  },
+  "commands": {
+    "lint": "./lint.sh"
   }
 }
