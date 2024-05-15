@@ -159,6 +159,11 @@ function pull {
     fi
 }
 
+# push a file to the server
+function push {
+    ee "rsync -Ptv '$1' '$2'"
+}
+
 # set xreader view mode to "two-up (facing)"
 function set-view-dual {
     ee "ssh '$1' \"gio set '$2' metadata::xreader::dual-page-odd-left 1\""
@@ -227,7 +232,7 @@ else
     ls-remote "$SERVER" "${REMOTE_DIR}/${MONTH}-${RANGE}*" || ls-remote "$SERVER" "${REMOTE_DIR}/${MONTH}*" || ls-remote "$SERVER" "${REMOTE_DIR}/${YEAR}*"
     # archive file
     log "Archiving '$FILENAME'..."
-    ee "rsync -Ptv '$FILENAME' '$TARGET_PATH'"
+    push "$FILENAME" "$TARGET_PATH"
     # set "Document Reader" default view mode
     log 'Setting default view mode for "Document Reader."'
     if [[ -z "$ARCHIVE_VIEW_MODE" ]]; then
