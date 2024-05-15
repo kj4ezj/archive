@@ -1,5 +1,5 @@
 # archive
-Wraps rsync to check if files exist before sending
+Both `rsync` and `scp` will overwrite files that exist in the destination. The `archive.sh` BASH script wraps `rsync` to test if files exist before sending them to the destination, and provides ancillary services useful for digitizing documents.
 
 <!-- contents box begin -->
 <table>
