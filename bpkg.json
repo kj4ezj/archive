@@ -4,5 +4,8 @@
   "description": "Wraps rsync to check if files exist before sending, and other help archiving scans",
   "homepage": "https://github.com/kj4ezj/archive",
   "author": "Zach Butler <kj4ezj+archive.sh@pm.me>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "kj4ezj/ee": "main"
+  }
 }
