@@ -72,9 +72,6 @@ documents.
 $ archive [OPTIONS] [FILENAME]
 
 [OPTIONS] - command-line arguments to change behavior
-    -1, --single
-        Set the default view mode to "single page (facing)" in "Document Reader."
-
     -2, --dual
         Set the default view mode to "two-up (facing)" in "Document Reader."
 
@@ -89,6 +86,9 @@ $ archive [OPTIONS] [FILENAME]
 
     -r, --rotation
         Set the default rotation to 0° in "Document Reader."
+
+    -1, --single
+        Set the default view mode to "single page (facing)" in "Document Reader."
 
     -v, --version
         Print the script version with debug info and exit.
@@ -189,9 +189,7 @@ SUB_DIR="$ARCHIVE_PATH_DEFAULT"
 # parse args
 for (( i=1; i <= $#; i++)); do
     ARG="$(echo "${!i}" | tr -d '-')"
-    if [[ "$(echo "$ARG" | grep -icP '^(1|single*)$')" == '1' ]]; then
-        ARCHIVE_VIEW_MODE='single'
-    elif [[ "$(echo "$ARG" | grep -icP '^(2|dual*)$')" == '1' ]]; then
+    if [[ "$(echo "$ARG" | grep -icP '^(2|dual*)$')" == '1' ]]; then
         ARCHIVE_VIEW_MODE='dual'
     elif [[ "$(echo "$ARG" | grep -icP '^(h|help|[?])$')" == '1' ]]; then
         log-help-and-exit
@@ -202,6 +200,8 @@ for (( i=1; i <= $#; i++)); do
         SUB_DIR="${!i}"
     elif [[ "$(echo "$ARG" | grep -icP '^(r|rotation)$')" == '1' ]]; then
         ARCHIVE_ROTATION='0'
+    elif [[ "$(echo "$ARG" | grep -icP '^(1|single*)$')" == '1' ]]; then
+        ARCHIVE_VIEW_MODE='single'
     elif [[ "$(echo "$ARG" | grep -icP '^(v|version)$')" == '1' ]]; then
         log-version-and-exit
     else
