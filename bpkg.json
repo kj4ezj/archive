@@ -15,6 +15,7 @@
     "kj4ezj/ee": "main"
   },
   "commands": {
+    "act": "act --artifact-server-path .github/artifacts",
     "lint": "./lint.sh"
   }
 }
