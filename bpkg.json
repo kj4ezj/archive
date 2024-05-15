@@ -5,6 +5,9 @@
   "homepage": "https://github.com/kj4ezj/archive",
   "author": "Zach Butler <kj4ezj+archive.sh@pm.me>",
   "license": "MIT",
+  "scripts": [
+    "archive.sh"
+  ],
   "dependencies": {
     "kj4ezj/ee": "main"
   }
