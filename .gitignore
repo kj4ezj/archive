@@ -1,0 +1,96 @@
+# archives
+*.7z
+*.7zip
+*.bz2
+*.gpg
+*.gz
+*.gzip
+*.lzo
+*.rar
+*.tar
+*.tgz
+*.xz
+*.zip
+*.zst
+*.zstd
+
+# binary files
+*.a
+*.bin
+*.dll
+*.exe
+*.msi
+*.o
+*.obj
+*.so
+
+# build artifacts
+**/artifacts
+**/build
+**/cache
+**/coverage
+**/deps
+**/dist
+**/node_modules
+**/out
+**/target
+**/tmp
+
+# data files
+*.csv
+*.db
+*.fods
+*.json
+*.ods
+*.odt
+*.ots
+*.sqlite
+*.tsv
+*.uos
+*.xls
+*.xlsm
+*.xlsx
+*.xlt
+*.xltx
+*.xml
+
+# editor files
+*.sw?
+.vscode
+.idea/
+
+# environment variable files
+.env
+
+# file explorer metadata
+**/._*
+**/.DS_Store
+**/.DS_Store?
+**/ehthumbs.db
+**/lost+found
+**/.Spotlight-V100
+**/.Trashes
+**/Thumbs.db
+
+._*
+*.DS_Store
+*.DS_Store?
+ehthumbs.db
+.Spotlight-V100
+.Trashes
+thumbs.db
+Thumbs.db
+thumbs.db:encryptable
+thumbs.db_encryptable
+
+# keys and certs
+*.cer
+*.crt
+*.key
+*.pem
+*.pub
+
+# logs
+logs
+*.log
+*.txt
