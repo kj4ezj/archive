@@ -13,9 +13,9 @@ function count-pages {
 # test if a file exists
 function file-exists {
     if ee "ssh '$1' \"[[ -f '$2' ]]\""; then
-        return 1
-    else
         return 0
+    else
+        return 1
     fi
 }
 
