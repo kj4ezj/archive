@@ -2,9 +2,11 @@
 *.7z
 *.7zip
 *.bz2
+*.dmg
 *.gpg
 *.gz
 *.gzip
+*.iso
 *.lzo
 *.rar
 *.tar
@@ -17,28 +19,37 @@
 # binary files
 *.a
 *.bin
+*.d
 *.dll
-*.exe
-*.msi
+*.dylib
+*.gch
+*.la
+*.lai
+*.lib
+*.lo
 *.o
 *.obj
+*.pch
+*.slo
 *.so
 
 # build artifacts
-**/artifacts
-**/build
-**/cache
-**/coverage
-**/deps
-**/dist
-**/node_modules
-**/out
-**/target
-**/tmp
+artifacts
+build
+.cache
+cache
+coverage
+deps
+dist
+node_modules
+out
+target
+tmp
 
 # data files
 *.csv
 *.db
+*.dbf
 *.fods
 *.json
 *.ods
@@ -55,33 +66,38 @@
 *.xml
 
 # editor files
+.ccls-cache
+.idea
 *.sw?
+*.vim
 .vscode
-.idea/
 
 # environment variable files
 .env
 
-# file explorer metadata
-**/._*
-**/.DS_Store
-**/.DS_Store?
-**/ehthumbs.db
-**/lost+found
-**/.Spotlight-V100
-**/.Trashes
-**/Thumbs.db
+# executables
+*.apk
+*.app
+*.AppImage
+*.com
+*.deb
+*.exe
+*.jar
+*.msi
+*.out
+*.rpm
 
+# file explorer metadata
 ._*
-*.DS_Store
-*.DS_Store?
+*.DS_Store*
 ehthumbs.db
-.Spotlight-V100
-.Trashes
+lost+found
+.Spotlight*
 thumbs.db
 Thumbs.db
 thumbs.db:encryptable
 thumbs.db_encryptable
+.Trashes
 
 # keys and certs
 *.cer
@@ -93,4 +109,37 @@ thumbs.db_encryptable
 # logs
 logs
 *.log
+*.log*
 *.txt
+
+# node
+.cache
+coverage
+dist
+.eslintcache
+*.lcov
+lib-cov
+*.lock
+.next
+node_modules
+.node_repl_history
+.npm
+npm-debug.log*
+.nuxt
+.serverless
+*.tsbuildinfo
+typings
+yarn-debug.log*
+yarn-error.log*
+.yarn-integrity
+
+# python
+__pycache__
+.mypy_cache
+
+# temporary files
+*.bak
+*.old
+*.orig
+*.test
+*.tmp
