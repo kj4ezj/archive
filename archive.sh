@@ -4,6 +4,21 @@ export GIT_BRANCH=''  # populated by make install
 export GIT_ORIGIN=''  # populated by make install
 export GIT_VERSION='' # populated by make install
 
+# count PDF pages
+function count-pages {
+    PAGE_COUNT="$(pdfinfo "$1" | grep 'Pages' | awk '{print $2}')"
+    return "$PAGE_COUNT"
+}
+
+# test if a file exists
+function file-exists {
+    if ee "ssh '$1' \"[[ -f '$2' ]]\""; then
+        return 1
+    else
+        return 0
+    fi
+}
+
 # populate the git branch, origin, and version
 function git-metadata {
     # branch
@@ -53,19 +68,42 @@ archive.sh BASH script wraps `rsync` to test if files exist before sending them
 to the destination, and provides ancillary services useful for digitizing
 documents.
 
-$ archive [OPTIONS]
+$ archive [OPTIONS] [FILENAME]
 
 [OPTIONS] - command-line arguments to change behavior
+    -1, --single
+        Set the default view mode to "single page (facing)" in "Document Reader."
+
+    -2, --dual
+        Set the default view mode to "two-up (facing)" in "Document Reader."
+
     -h, --help, -?
         Print this help message and exit.
 
     -l, --license
         Print software license and exit.
 
+    -p, --path
+        Specify the subdirectory to archive to, appended to ARCHIVE_TARGET.
+
+    -r, --rotation
+        Set the default rotation to 0° in "Document Reader."
+
     -v, --version
         Print the script version with debug info and exit.
 
 [VARIABLES] - configurable environment variables
+    ARCHIVE_PATH_DEFAULT
+        The default subdirectory to archive to, appended to ARCHIVE_TARGET.
+
+    ARCHIVE_ROTATION
+        The default rotation for "Document Reader" to use when opening files.
+
+    ARCHIVE_TARGET
+        The destination directory for your files to be archived.
+
+    ARCHIVE_VIEW_MODE
+        The default view mode for "Document Reader" to use when opening files.
 
 [NOTES]
 Arguments take precedence over environment variables.
@@ -107,20 +145,117 @@ function log-version-and-exit {
     exit 0
 }
 
+# list file(s) on the server
+function ls-remote {
+    ee "ssh '$1' \"ls -la $2\"" || return "$?"
+}
+
+# pull a file from the server
+function pull {
+    if [[ -f "$2" ]]; then
+        ee "rsync -Ptv '$1' '$2_$(date '+%s')'"
+    else
+        ee "rsync -Ptv '$1' '$2'"
+    fi
+}
+
+# set xreader view mode to "two-up (facing)"
+function set-view-dual {
+    ee "ssh '$1' \"gio set '$2' metadata::xreader::dual-page-odd-left 1\""
+}
+
+# set xreader rotation
+function set-view-rotation {
+    ee "ssh '$1' \"gio set '$2' metadata::xreader::rotation $3\""
+}
+
+# set xreader view mode to "single page (facing)"
+function set-view-single {
+    ee "ssh '$1' \"gio set '$2' metadata::xreader::sizing_mode best-fit\""
+}
+
 # main
 git-metadata
+SUB_DIR="$ARCHIVE_PATH_DEFAULT"
 # parse args
 for (( i=1; i <= $#; i++)); do
     ARG="$(echo "${!i}" | tr -d '-')"
-    if [[ "$(echo "$ARG" | grep -icP '^(h|help|[?])$')" == '1' ]]; then
+    if [[ "$(echo "$ARG" | grep -icP '^(1|single*)$')" == '1' ]]; then
+        ARCHIVE_VIEW_MODE='single'
+    elif [[ "$(echo "$ARG" | grep -icP '^(2|dual*)$')" == '1' ]]; then
+        ARCHIVE_VIEW_MODE='dual'
+    elif [[ "$(echo "$ARG" | grep -icP '^(h|help|[?])$')" == '1' ]]; then
         log-help-and-exit
     elif [[ "$(echo "$ARG" | grep -icP '^(license)$')" == '1' ]]; then
         log-license-and-exit
+    elif [[ "$(echo "$ARG" | grep -icP '^(p|path)$')" == '1' ]]; then
+        i="$(( i+1 ))"
+        SUB_DIR="${!i}"
+    elif [[ "$(echo "$ARG" | grep -icP '^(r|rotation)$')" == '1' ]]; then
+        ARCHIVE_ROTATION='0'
     elif [[ "$(echo "$ARG" | grep -icP '^(v|version)$')" == '1' ]]; then
         log-version-and-exit
+    else
+        FILENAME="${!i}"
     fi
 done
 log 'Begin.'
+# get SSH server
+SERVER="$(echo "$ARCHIVE_TARGET" | cut -d ':' -f '1')"
+# get target directory
+REMOTE_DIR="$(echo "$ARCHIVE_TARGET" | cut -d ':' -f '2')/${SUB_DIR}"
+REMOTE_PATH="${REMOTE_DIR}/${FILENAME}"
+TARGET_DIR="${ARCHIVE_TARGET}/${SUB_DIR}"
+TARGET_PATH="${TARGET_DIR}/${FILENAME}"
+# test if the file exists
+if file-exists "$SERVER" "$REMOTE_PATH"; then
+    log "File '$FILENAME' exists at '$TARGET_PATH'."
+    ls-remote "$SERVER" "$REMOTE_PATH"
+    log 'Pulling file...'
+    pull "$TARGET_PATH" "$FILENAME"
+    log 'File NOT archived! Decide what to keep and send it with this command:'
+    log "$ rsync -Ptv '$FILENAME' '$TARGET_PATH'"
+else
+    log "File '$FILENAME' does not exist at '$TARGET_PATH'."
+    # get date and date parts
+    DATE="$(echo "$FILENAME" | grep -oP '^\d{4}-\d{2}-\d{2}')"
+    DD="$(echo "$DATE" | grep -oP '\d{2}' | sed -n '4p')"
+    MONTH="$(echo "$DATE" | grep -oP '^\d{4}-\d{2}')"
+    RANGE="{$(( DD-1 )),$DD,$(( DD+1 ))}"
+    YEAR="$(echo "$DATE" | grep -oP '^\d{4}')"
+    # list neighbor files
+    ls-remote "$SERVER" "${REMOTE_DIR}/${MONTH}-${RANGE}*" || ls-remote "$SERVER" "${REMOTE_DIR}/${MONTH}*" || ls-remote "$SERVER" "${REMOTE_DIR}/${YEAR}*"
+    # archive file
+    log "Archiving '$FILENAME'..."
+    ee "rsync -Ptv '$FILENAME' '$TARGET_PATH'"
+    # set "Document Reader" default view mode
+    log 'Setting default view mode for "Document Reader."'
+    if [[ -z "$ARCHIVE_VIEW_MODE" ]]; then
+        PAGE_COUNT="$(count-pages "$FILENAME")"
+        log "Found $PAGE_COUNT page PDF."
+        if (( PAGE_COUNT > 1 )); then
+            ARCHIVE_VIEW_MODE='dual'
+        else
+            ARCHIVE_VIEW_MODE='single'
+        fi
+    fi
+    if [[ "$ARCHIVE_VIEW_MODE" == 'dual' ]]; then
+        set-view-dual "$SERVER" "$REMOTE_PATH"
+        log 'Default view set to "two-up (facing)".'
+    else
+        set-view-single "$SERVER" "$REMOTE_PATH"
+        log 'Default view set to "single page (facing)".'
+    fi
+    # set "Document Reader" default rotation
+    if [[ -n "$ARCHIVE_ROTATION" ]]; then
+        log 'Setting default rotation for "Document Reader."'
+        set-view-rotation "$SERVER" "$REMOTE_PATH" "$ARCHIVE_ROTATION"
+        log "Default rotation set to $ROTATION°."
+    fi
+    # pause for user, then delete local file
+    read -rp "Press [Enter] to delete the local copy of '$FILENAME'..."
+    rm "$FILENAME"
+fi
 log 'Done.'
 
 # https://github.com/kj4ezj/archive
