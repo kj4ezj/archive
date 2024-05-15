@@ -6,6 +6,8 @@
   "author": "Zach Butler <kj4ezj+archive.sh@pm.me>",
   "license": "MIT",
   "global": "true",
+  "install": "make install",
+  "uninstall" : "make uninstall",
   "scripts": [
     "archive.sh"
   ],
