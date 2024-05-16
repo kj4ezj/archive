@@ -179,7 +179,7 @@ function multi-page-pdf-util {
         PAGE_COUNT="$(count-pages "$FILE")"
         # if it's a multi-page PDF, print the filename
         if (( PAGE_COUNT > 1 )); then
-            echo "${FILE/#.\//}"
+            printf " %3d    %s\n" "$PAGE_COUNT" "${FILE/#.\//}"
         fi
     done
     exit 0
