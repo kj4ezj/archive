@@ -60,17 +60,6 @@ function git-uri {
     echo "https://$ORIGIN/tree/$GIT_VERSION"
 }
 
-# list all multi-page PDFs in the current directory, ignoring file extension case and ignoring subdirectories
-function list-multi-page-pdfs {
-    find . -maxdepth 1 -type f -iname '*.pdf' | sort | while IFS= read -r FILE; do
-        PAGE_COUNT="$(count-pages "$FILE")"
-        # if it's a multi-page PDF, print the filename
-        if (( PAGE_COUNT > 1 )); then
-            echo "${FILE/#.\//}"
-        fi
-    done
-}
-
 # prepend timestamp and script name to log lines
 function log {
     printf "\e[0;30m%s ${0##*/} -\e[0m $*\n" "$(date '+%F %T %Z')"
@@ -184,6 +173,18 @@ function ls-remote {
     ee "ssh '$1' \"ls -la $2\"" || return "$?"
 }
 
+# list all multi-page PDFs in the current directory, ignoring file extension case and ignoring subdirectories
+function multi-page-pdf-util {
+    find . -maxdepth 1 -type f -iname '*.pdf' | sort | while IFS= read -r FILE; do
+        PAGE_COUNT="$(count-pages "$FILE")"
+        # if it's a multi-page PDF, print the filename
+        if (( PAGE_COUNT > 1 )); then
+            echo "${FILE/#.\//}"
+        fi
+    done
+    exit 0
+}
+
 # pull a file from the server
 function pull {
     if [[ -f "$2" ]]; then
@@ -228,8 +229,7 @@ for (( i=1; i <= $#; i++)); do
     elif [[ "$(echo "$ARG" | grep -icP '^(l|license)$')" == '1' ]]; then
         log-license-and-exit
     elif [[ "$(echo "$ARG" | grep -icP '^(m|list-?multi-?page-?pdfs?)$')" == '1' ]]; then
-        list-multi-page-pdfs
-        exit 0
+        multi-page-pdf-util 'list'
     elif [[ "$(echo "$ARG" | grep -icP '^(p|path)$')" == '1' ]]; then
         i="$(( i+1 ))"
         SUB_DIR="${!i}"
