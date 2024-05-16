@@ -182,14 +182,14 @@ function multi-page-pdf-util {
         PAGE_COUNT="$(count-pages "$FILE")"
         # if it's a multi-page PDF, print the filename
         if (( PAGE_COUNT > 1 )); then
-            printf " %3d    %s\n" "$PAGE_COUNT" "${FILE/#.\//}"
-            if [[ "$1" == 'split' ]]; then # split multi-page PDFs
+            if [[ "$1" == 'list' ]]; then # split multi-page PDFs
+                printf " %3d    %s\n" "$PAGE_COUNT" "${FILE/#.\//}"
+            elif [[ "$1" == 'split' ]]; then # split multi-page PDFs
                 conditional-ee "pdfseparate '$FILE' '${FILE%%.[pP][dD][fF]}_%d.pdf'"
                 conditional-ee "rm '$FILE'"
             fi
         fi
     done
-    exit 0
 }
 
 # pull a file from the server
@@ -243,6 +243,7 @@ for (( i=1; i <= $#; i++)); do
         ARCHIVE_VIEW_MODE='dual'
     elif [[ "$(echo "$ARG" | grep -icP '^(m|list-?multi-?page-?pdfs?)$')" == '1' ]]; then
         multi-page-pdf-util 'list'
+        exit 0
     elif [[ "$(echo "$ARG" | grep -icP '^(p|path)$')" == '1' ]]; then
         i="$(( i+1 ))"
         SUB_DIR="${!i}"
@@ -251,7 +252,9 @@ for (( i=1; i <= $#; i++)); do
     elif [[ "$(echo "$ARG" | grep -icP '^(1|single*)$')" == '1' ]]; then
         ARCHIVE_VIEW_MODE='single'
     elif [[ "$(echo "$ARG" | grep -icP '^(s|split|split-?(multi-?page-?)?pdfs?)$')" == '1' ]]; then
+        multi-page-pdf-util 'list'
         multi-page-pdf-util 'split'
+        exit 0
     else
         FILENAME="${!i}"
     fi
