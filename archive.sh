@@ -113,6 +113,9 @@ $ archive [OPTIONS] [FILENAME]
         --merge-pdf, --merge
             Merge one series of PDFs into one.
 
+    -m, --merge-pdfs, --merge-all-pdfs
+            Merge all series of PDFs in the current directory, then exit.
+
     -p, --path
             Specify the subdirectory to archive to, appended to ARCHIVE_TARGET.
 
@@ -202,6 +205,13 @@ function log-version-and-exit {
 # list file(s) on the server
 function ls-remote {
     ee "ssh '$1' \"ls -la $2\"" || return "$?"
+}
+
+# merge all sets of PDFs in the current directory
+function merge-multiple {
+    for FILE in *_2.pdf; do
+        merge-pdfs "${FILE/#.\//}"
+    done
 }
 
 # given a series of PDFs, merge them into one
@@ -313,6 +323,9 @@ for (( i=1; i <= $#; i++)); do
         exit 0
     elif [[ "$(echo "$ARG" | grep -icP '^(merge-?(pdf)?)$')" == '1' ]]; then
         MERGE_SINGLE='true'
+    elif [[ "$(echo "$ARG" | grep -icP '^(m|merge-?((all)?-?pdfs)?)$')" == '1' ]]; then
+        merge-multiple
+        exit 0
     elif [[ "$(echo "$ARG" | grep -icP '^(p|path)$')" == '1' ]]; then
         i="$(( i+1 ))"
         SUB_DIR="${!i}"
