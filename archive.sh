@@ -433,7 +433,7 @@ else
         log "Default rotation set to $ROTATION°."
     fi
     # pause for user, then delete local file
-    read -rp "Press [Enter] to delete the local copy of '$FILENAME'..."
+    read -rp "Press [Enter] to delete the local copy of '$FILENAME'...$([[ -n "$ARCHIVE_DRY_RUN" ]] && echo ' - \e[1m\e[33mDRY-RUN\e[0m')"
     conditional-ee "rm '$FILENAME'" || fail "ERROR: Failed to delete '$FILENAME'! rm returned exit code '$?'." "$?"
 fi
 exit-success
