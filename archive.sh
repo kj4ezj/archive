@@ -184,8 +184,8 @@ function multi-page-pdf-util {
         if (( PAGE_COUNT > 1 )); then
             printf " %3d    %s\n" "$PAGE_COUNT" "${FILE/#.\//}"
             if [[ "$1" == 'split' ]]; then # split multi-page PDFs
-                pdfseparate "$FILE" "${FILE%%.[pP][dD][fF]}_%d.pdf"
-                rm "$FILE"
+                conditional-ee "pdfseparate '$FILE' '${FILE%%.[pP][dD][fF]}_%d.pdf'"
+                conditional-ee "rm '$FILE'"
             fi
         fi
     done
@@ -223,18 +223,24 @@ function set-view-single {
 
 # main
 git-metadata
-SUB_DIR="$ARCHIVE_PATH_DEFAULT"
 # parse args
 for (( i=1; i <= $#; i++)); do
     ARG="$(echo "${!i}" | tr -d '-')"
     if [[ "$(echo "$ARG" | grep -icP '^(dry-?run)$')" == '1' ]]; then
         ARCHIVE_DRY_RUN='true'
-    elif [[ "$(echo "$ARG" | grep -icP '^(2|dual*)$')" == '1' ]]; then
-        ARCHIVE_VIEW_MODE='dual'
     elif [[ "$(echo "$ARG" | grep -icP '^(h|help|[?])$')" == '1' ]]; then
         log-help-and-exit
     elif [[ "$(echo "$ARG" | grep -icP '^(l|license)$')" == '1' ]]; then
         log-license-and-exit
+    elif [[ "$(echo "$ARG" | grep -icP '^(v|version)$')" == '1' ]]; then
+        log-version-and-exit
+    fi
+done
+SUB_DIR="$ARCHIVE_PATH_DEFAULT"
+for (( i=1; i <= $#; i++)); do
+    ARG="$(echo "${!i}" | tr -d '-')"
+    if [[ "$(echo "$ARG" | grep -icP '^(2|dual*)$')" == '1' ]]; then
+        ARCHIVE_VIEW_MODE='dual'
     elif [[ "$(echo "$ARG" | grep -icP '^(m|list-?multi-?page-?pdfs?)$')" == '1' ]]; then
         multi-page-pdf-util 'list'
     elif [[ "$(echo "$ARG" | grep -icP '^(p|path)$')" == '1' ]]; then
@@ -246,8 +252,6 @@ for (( i=1; i <= $#; i++)); do
         ARCHIVE_VIEW_MODE='single'
     elif [[ "$(echo "$ARG" | grep -icP '^(s|split|split-?(multi-?page-?)?pdfs?)$')" == '1' ]]; then
         multi-page-pdf-util 'split'
-    elif [[ "$(echo "$ARG" | grep -icP '^(v|version)$')" == '1' ]]; then
-        log-version-and-exit
     else
         FILENAME="${!i}"
     fi
