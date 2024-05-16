@@ -298,7 +298,8 @@ git-metadata
 for (( i=1; i <= $#; i++)); do
     ARG="$(echo "${!i}" | tr -d '-')"
     if [[ "$(echo "$ARG" | grep -icP '^(dry-?run)$')" == '1' ]]; then
-        ARCHIVE_DRY_RUN='true'
+        export ARCHIVE_DRY_RUN='true'
+        log 'DRY_RUN SET.'
     elif [[ "$(echo "$ARG" | grep -icP '^(h|help|[?])$')" == '1' ]]; then
         log-help-and-exit
     elif [[ "$(echo "$ARG" | grep -icP '^(l|license)$')" == '1' ]]; then
@@ -311,7 +312,7 @@ SUB_DIR="$ARCHIVE_PATH_DEFAULT"
 for (( i=1; i <= $#; i++)); do
     ARG="$(echo "${!i}" | tr -d '-')"
     if [[ "$(echo "$ARG" | grep -icP '^(dry-?run)$')" == '1' ]]; then
-        ARCHIVE_DRY_RUN='true'
+        export ARCHIVE_DRY_RUN='true'
     elif [[ "$(echo "$ARG" | grep -icP '^(2|dual*)$')" == '1' ]]; then
         ARCHIVE_VIEW_MODE='dual'
     elif [[ "$(echo "$ARG" | grep -icP '^(list-?multi-?(page)?-?(pdfs?)?)$')" == '1' ]]; then
