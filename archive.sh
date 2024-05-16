@@ -171,18 +171,29 @@ function log-version-and-exit {
     echo "$GIT_REPO:$GIT_VERSION on $GIT_BRANCH from $(date -d "@$GIT_UNIXTS" '+%F %T %Z')"
     echo
     readlink -f "$0"
-    git-uri
     if [[ -f /etc/os-release ]]; then
         source /etc/os-release
-        printf 'Running on %s %s with ' "$NAME" "$VERSION"
+        printf 'Running on %s %s with:\n' "$NAME" "$VERSION"
     elif [[ "$(uname)" == 'Darwin' ]]; then
-        printf 'Running on %s %s with ' "$(sw_vers -productName)" "$(sw_vers -productVersion)"
+        printf 'Running on %s %s with:\n' "$(sw_vers -productName)" "$(sw_vers -productVersion)"
     elif [[ "$(uname)" == 'Linux' ]]; then
-        printf 'Running on Linux %s with ' "$(uname -r)"
+        printf 'Running on Linux %s with:\n' "$(uname -r)"
     else
-        echo 'Running on unidentified OS with '
+        echo 'Running on unidentified OS with:'
     fi
+    printf '    '
     bash --version | head -1
+    printf '    '
+    grep --version | head -1
+    RSYNC_VERSION="$(rsync -V 2>&1 || :)"
+    printf '    '
+    echo "$RSYNC_VERSION" | head -1
+    printf '    '
+    ssh -V 2>&1
+    printf '    '
+    pdfinfo -v 2>&1 | head -1
+    echo
+    git-uri
     echo 'Copyright © 2024 Zach Butler'
     echo 'MIT License'
     exit 0
