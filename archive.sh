@@ -286,17 +286,17 @@ function push {
 
 # set xreader view mode to "two-up (facing)"
 function set-view-dual {
-    conditional-ee "ssh '$1' \"gio set '$2' metadata::xreader::dual-page-odd-left 1\""
+    conditional-ee "ssh '$1' \"gio set '$2' metadata::xreader::dual-page-odd-left 1\"" || fail "ERROR: Failed to set view mode to 'two-up (facing)' on '$1:$2'! ssh or gio returned exit code '$?'." "$?"
 }
 
 # set xreader rotation
 function set-view-rotation {
-    conditional-ee "ssh '$1' \"gio set '$2' metadata::xreader::rotation $3\""
+    conditional-ee "ssh '$1' \"gio set '$2' metadata::xreader::rotation $3\"" || fail "ERROR: Failed to set rotation to '$3' on '$1:$2'! ssh or gio returned exit code '$?'." "$?"
 }
 
 # set xreader view mode to "single page (facing)"
 function set-view-single {
-    conditional-ee "ssh '$1' \"gio set '$2' metadata::xreader::sizing_mode best-fit\""
+    conditional-ee "ssh '$1' \"gio set '$2' metadata::xreader::sizing_mode best-fit\"" || fail "ERROR: Failed to set view mode to 'single page (facing)' on '$1:$2'! ssh or gio returned exit code '$?'." "$?"
 }
 
 # main
