@@ -110,8 +110,8 @@ $ archive [OPTIONS] [FILENAME]
         --list-multi-page-pdfs, --list-multi
             List all multi-page PDFs in the current directory, then exit.
 
-    -m, --merge
-            Merge a series of PDFs into one.
+        --merge-pdf, --merge
+            Merge one series of PDFs into one.
 
     -p, --path
             Specify the subdirectory to archive to, appended to ARCHIVE_TARGET.
@@ -311,7 +311,7 @@ for (( i=1; i <= $#; i++)); do
     elif [[ "$(echo "$ARG" | grep -icP '^(list-?multi-?(page)?-?(pdfs?)?)$')" == '1' ]]; then
         multi-page-pdf-util 'list'
         exit 0
-    elif [[ "$(echo "$ARG" | grep -icP '^(m|merge-?(pdfs?)?)$')" == '1' ]]; then
+    elif [[ "$(echo "$ARG" | grep -icP '^(merge-?(pdf)?)$')" == '1' ]]; then
         merge-pdfs "${!i}"
         exit 0
     elif [[ "$(echo "$ARG" | grep -icP '^(p|path)$')" == '1' ]]; then
