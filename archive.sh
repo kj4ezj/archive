@@ -434,7 +434,7 @@ else
     fi
     # pause for user, then delete local file
     read -rp "Press [Enter] to delete the local copy of '$FILENAME'..."
-    rm "$FILENAME"
+    conditional-ee "rm '$FILENAME'" || fail "ERROR: Failed to delete '$FILENAME'! rm returned exit code '$?'." "$?"
 fi
 exit-success
 
