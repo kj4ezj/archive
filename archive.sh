@@ -245,20 +245,29 @@ function merge-pdfs {
 
 # list all multi-page PDFs in the current directory, ignoring file extension case and ignoring subdirectories
 function multi-page-pdf-util {
-    find . -maxdepth 1 -type f -iname '*.pdf' | sort | while IFS= read -r FILE; do
+    FOUND_ANY_PDF_FILE='false'
+    FOUND_MULTI_PAGE_PDF='false'
+    while IFS= read -r FILE; do
         PDF_FILE="${FILE/#.\//}"
+        FOUND_ANY_PDF_FILE='true'
         PAGE_COUNT="$(count-pages "$PDF_FILE")"
         # if it's a multi-page PDF, print the filename
         if (( PAGE_COUNT > 1 )); then
+            FOUND_MULTI_PAGE_PDF='true'
             if [[ "$1" == 'list' ]]; then # list multi-page PDFs
                 printf " %3d    %s\n" "$PAGE_COUNT" "$PDF_FILE"
             elif [[ "$1" == 'split' ]]; then # split multi-page PDFs
-                conditional-ee "pdfseparate '$PDF_FILE' '${PDF_FILE%%.[pP][dD][fF]}_%d.pdf'"
-                conditional-ee "rm '$PDF_FILE'"
+                conditional-ee "pdfseparate '$PDF_FILE' '${PDF_FILE%%.[pP][dD][fF]}_%d.pdf'" || fail "ERROR: Failed to split '$PDF_FILE'! pdfseparate returned exit code '$?'." "$?"
+                conditional-ee "rm '$PDF_FILE'" || fail "ERROR: Failed to delete '$PDF_FILE' after splitting! rm returned exit code '$?'." "$?"
                 log "\e[32mSplit '$FILE'.\e[0m"
             fi
         fi
-    done
+    done < <(find . -maxdepth 1 -type f -iname '*.pdf' | sort)
+    if [[ "$FOUND_ANY_PDF_FILE" == 'false' ]]; then
+        fail 'No PDF files found in the current directory!' 13
+    elif [[ "$FOUND_MULTI_PAGE_PDF" == 'false' ]]; then
+        fail 'No multi-page PDFs found in the current directory!' 14
+    fi
 }
 
 # pull a file from the server
