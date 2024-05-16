@@ -257,6 +257,7 @@ function multi-page-pdf-util {
             elif [[ "$1" == 'split' ]]; then # split multi-page PDFs
                 conditional-ee "pdfseparate '$PDF_FILE' '${PDF_FILE%%.[pP][dD][fF]}_%d.pdf'"
                 conditional-ee "rm '$PDF_FILE'"
+                log "\e[32mSplit '$FILE'.\e[0m"
             fi
         fi
     done
