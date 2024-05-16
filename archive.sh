@@ -221,20 +221,16 @@ function merge-pdfs {
     BASE="${BASE%.pdf}"
     BASE="${BASE/#.\//}"
     MERGED="${BASE}.pdf"
-    # find all parts in the series
-    PARTS=()
-    while IFS= read -r PDF_FILE < <(find . -maxdepth 1 -type f -iname "${BASE}_*.pdf" | sort -V); do
-        PDF_FILE="${PDF_FILE/#.\//}"
-        log "Found part '$PDF_FILE'."
-        PARTS+=("$PDF_FILE")
-    done
-    # check if the series exists
+    # find all parts in the series and verify the series is not empty
+    PARTS=$(find . -maxdepth 1 -type f -iname "${BASE}_*.pdf" | sort -V)
     if [[ ${#PARTS[@]} -eq 0 ]]; then
         fail "ERROR: No PDFs found in the series for '$1'!"
     fi
     # merge PDFs
     PDFUNITE_CMD='pdfunite'
     for PART in "${PARTS[@]}"; do
+        PDF_FILE="${PDF_FILE/#.\//}"
+        log "Found part '$PDF_FILE'."
         PDFUNITE_CMD+=" '$PART'"
     done
     PDFUNITE_CMD+=" '$MERGED'"
