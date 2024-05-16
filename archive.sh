@@ -420,16 +420,16 @@ else
     fi
     if [[ "$ARCHIVE_VIEW_MODE" == 'dual' ]]; then
         set-view-dual "$SERVER" "$REMOTE_PATH"
-        log 'Default view set to "two-up (facing)".'
+        log '\e[36mDefault view set to "two-up (facing)".\e[0m'
     else
         set-view-single "$SERVER" "$REMOTE_PATH"
-        log 'Default view set to "single page (facing)".'
+        log '\e[34mDefault view set to "single page (facing)".\e[0m'
     fi
     # set "Document Reader" default rotation
     if [[ -n "$ARCHIVE_ROTATION" ]]; then
         log 'Setting default rotation for "Document Reader."'
         set-view-rotation "$SERVER" "$REMOTE_PATH" "$ARCHIVE_ROTATION"
-        log "Default rotation set to $ROTATION°."
+        log "\e[35mDefault rotation set to $ROTATION°.\e[0m"
     fi
     # pause for user, then delete local file
     read -rp "Press [Enter] to delete the local copy of '$FILENAME'...$([[ -n "$ARCHIVE_DRY_RUN" ]] && echo ' - \e[1m\e[33mDRY-RUN\e[0m')"
