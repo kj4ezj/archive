@@ -242,7 +242,7 @@ function merge-pdfs {
     for PART in "${PARTS[@]}"; do
         conditional-ee "rm '$PART'"
     done
-    log "Merged PDFs into '$MERGED'."
+    log "\e[32mMerged PDFs into '$MERGED'.\e[0m"
 }
 
 # list all multi-page PDFs in the current directory, ignoring file extension case and ignoring subdirectories
