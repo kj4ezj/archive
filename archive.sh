@@ -17,7 +17,7 @@ function conditional-ee {
 # count PDF pages
 function count-pages {
     PAGE_COUNT="$(pdfinfo "$1" | grep 'Pages' | awk '{print $2}')"
-    return "$PAGE_COUNT"
+    echo "$PAGE_COUNT"
 }
 
 # test if a file exists
