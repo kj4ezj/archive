@@ -222,16 +222,15 @@ function merge-pdfs {
     BASE="${BASE/#.\//}"
     MERGED="${BASE}.pdf"
     # find all parts in the series and verify the series is not empty
-    mapfile -t PARTS < <(find . -maxdepth 1 -type f -iname "${BASE}_*.pdf" | sort -V)
+    mapfile -t PARTS < <(find . -maxdepth 1 -type f -iname "${BASE}_*.pdf" | sort -V | sed 's_./__')
     if [[ "${#PARTS[@]}" == '0' ]]; then
         fail "ERROR: No PDFs found in the series for '$1'!"
     fi
     # merge PDFs
     PDFUNITE_CMD='pdfunite'
     for PART in "${PARTS[@]}"; do
-        PDF_FILE="${PART/#.\//}"
-        log "Found part '$PDF_FILE'."
-        PDFUNITE_CMD+=" '$PDF_FILE'"
+        log "Found part '$PART'."
+        PDFUNITE_CMD+=" '$PART'"
     done
     PDFUNITE_CMD+=" '$MERGED'"
     conditional-ee "$PDFUNITE_CMD" || EXIT_STATUS="$?"
