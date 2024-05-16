@@ -389,7 +389,7 @@ if [[ -n "$ARCHIVE_DRY_RUN" ]]; then
 fi
 # test if the file exists
 if file-exists "$SERVER" "$REMOTE_PATH"; then
-    log "File '$FILENAME' exists at '$TARGET_PATH'."
+    log "\e[1m\e[33mNOTICE: File '$FILENAME' already exists at '$TARGET_PATH'.\e[0m"
     ls-remote "$SERVER" "$REMOTE_PATH"
     log 'Pulling file...'
     pull "$TARGET_PATH" "$FILENAME"
