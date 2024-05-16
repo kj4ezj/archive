@@ -223,6 +223,12 @@ function merge-pdfs {
     BASE="${BASE%.pdf}"
     BASE="${BASE/#.\//}"
     MERGED="${BASE}.pdf"
+    # handle edge-case where example_1.pdf is named example.pdf
+    if [[ -f "${BASE}.pdf" && ! -f "${BASE}_1.pdf" ]]; then
+        conditional-ee "mv '${BASE}.pdf' '${BASE}_1.pdf'" || fail "ERROR: Failed to rename '${BASE}.pdf' to '${BASE}_1.pdf'! mv returned exit status '$?'." "$?"
+    elif [[ -f "${BASE}.pdf" && -f "${BASE}_1.pdf" ]]; then
+        fail "ERROR: Both '${BASE}.pdf' and '${BASE}_1.pdf' exist! Rename or delete one of them." 15
+    fi
     # find all parts in the series and verify the series is not empty
     mapfile -t PARTS < <(find . -maxdepth 1 -type f -iname "${BASE}_*.pdf" | sort -V | sed 's_./__')
     if [[ "${#PARTS[@]}" == '0' ]]; then
