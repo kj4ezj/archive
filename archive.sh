@@ -223,7 +223,7 @@ function merge-pdfs {
     MERGED="${BASE}.pdf"
     # find all parts in the series and verify the series is not empty
     mapfile -t PARTS < <(find . -maxdepth 1 -type f -iname "${BASE}_*.pdf" | sort -V)
-    if [[ ${#PARTS[@]} -eq 0 ]]; then
+    if [[ "${#PARTS[@]}" == '0' ]]; then
         fail "ERROR: No PDFs found in the series for '$1'!"
     fi
     # merge PDFs
