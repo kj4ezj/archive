@@ -3,6 +3,7 @@ set -eo pipefail
 ARCHIVE_RSYNC_FLAGS_DEFAULT='-Ptv'
 export GIT_BRANCH=''  # populated by make install
 export GIT_ORIGIN=''  # populated by make install
+export GIT_UNIXTS=''  # populated by make install
 export GIT_VERSION='' # populated by make install
 
 # run a command if dry-run is not set
@@ -51,6 +52,11 @@ function git-metadata {
     ORIGIN="$(echo "$GIT_ORIGIN" | sed 's/[.]git//' | sed -E 's_(git@|https?://)__' | tr ':' '/')"
     GIT_REPO="${ORIGIN#*/}"
     export GIT_ORIGIN GIT_REPO
+    # commit timestamp
+    if [[ -z "$GIT_UNIXTS" ]]; then
+        GIT_UNIXTS="$(git log -1 --format='%ct')"
+        export GIT_UNIXTS
+    fi
     # version string
     if [[ -z "$GIT_VERSION" ]]; then
         SCRIPT_PATH="$(readlink -f "$0")"
@@ -162,7 +168,7 @@ function log-license-and-exit {
 
 # print script version and other info
 function log-version-and-exit {
-    echo "$GIT_REPO:$GIT_VERSION on $GIT_BRANCH"
+    echo "$GIT_REPO:$GIT_VERSION on $GIT_BRANCH from $(date -d "@$GIT_UNIXTS" '+%F %T %Z')"
     echo
     readlink -f "$0"
     git-uri
