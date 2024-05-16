@@ -312,8 +312,7 @@ for (( i=1; i <= $#; i++)); do
         multi-page-pdf-util 'list'
         exit 0
     elif [[ "$(echo "$ARG" | grep -icP '^(merge-?(pdf)?)$')" == '1' ]]; then
-        merge-pdfs "${!i}"
-        exit 0
+        MERGE_SINGLE='true'
     elif [[ "$(echo "$ARG" | grep -icP '^(p|path)$')" == '1' ]]; then
         i="$(( i+1 ))"
         SUB_DIR="${!i}"
@@ -330,6 +329,11 @@ for (( i=1; i <= $#; i++)); do
     fi
 done
 log 'Begin.'
+# run single PDF merge, if requested
+if [[ "$MERGE_SINGLE" == 'true' ]]; then
+    merge-pdfs "$FILENAME"
+    exit 0
+fi
 # get SSH server
 SERVER="$(echo "$ARCHIVE_TARGET" | cut -d ':' -f '1')"
 # get target directory
