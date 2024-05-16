@@ -237,7 +237,7 @@ function merge-pdfs {
     conditional-ee "$PDFUNITE_CMD" || EXIT_STATUS="$?"
     # check if the merge was successful
     if [[ "$EXIT_STATUS" != '0' ]]; then
-        fail "ERROR: Failed to merge the PDF parts! pdfunite returned exit code $?."
+        fail "ERROR: Failed to merge the PDF parts! pdfunite returned exit code $EXIT_STATUS."
     fi
     # remove the parts after merging
     for PART in "${PARTS[@]}"; do
