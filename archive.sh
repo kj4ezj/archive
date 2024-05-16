@@ -212,9 +212,9 @@ function merge-pdfs {
     MERGED="${BASE}.pdf"
     # find all parts in the series
     PARTS=()
-    while IFS= read -r FILE < <(find . -maxdepth 1 -type f -iname "${BASE}_*.pdf" | sort -V); do
-        log "Found part '$FILE'."
-        PARTS+=("$FILE")
+    while IFS= read -r PDF_FILE < <(find . -maxdepth 1 -type f -iname "${BASE}_*.pdf" | sort -V); do
+        log "Found part '$PDF_FILE'."
+        PARTS+=("$PDF_FILE")
     done
     # check if the series exists
     if [[ ${#PARTS[@]} -eq 0 ]]; then
