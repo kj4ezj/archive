@@ -60,6 +60,17 @@ function git-uri {
     echo "https://$ORIGIN/tree/$GIT_VERSION"
 }
 
+# list all multi-page PDFs in the current directory, ignoring file extension case and ignoring subdirectories
+function list-multi-page-pdfs {
+    find . -maxdepth 1 -type f -iname '*.pdf' | sort | while IFS= read -r FILE; do
+        PAGE_COUNT="$(count-pages "$FILE")"
+        # if it's a multi-page PDF, print the filename
+        if (( PAGE_COUNT > 1 )); then
+            echo "${FILE/#.\//}"
+        fi
+    done
+}
+
 # prepend timestamp and script name to log lines
 function log {
     printf "\e[0;30m%s ${0##*/} -\e[0m $*\n" "$(date '+%F %T %Z')"
@@ -92,6 +103,9 @@ $ archive [OPTIONS] [FILENAME]
 
     -l, --license
             Print software license and exit.
+
+    -m  --list-multi-page-pdfs
+            List all multi-page PDFs in the current directory, then exit.
 
     -p, --path
             Specify the subdirectory to archive to, appended to ARCHIVE_TARGET.
@@ -213,6 +227,9 @@ for (( i=1; i <= $#; i++)); do
         log-help-and-exit
     elif [[ "$(echo "$ARG" | grep -icP '^(l|license)$')" == '1' ]]; then
         log-license-and-exit
+    elif [[ "$(echo "$ARG" | grep -icP '^(m|list-?multi-?page-?pdfs?)$')" == '1' ]]; then
+        list-multi-page-pdfs
+        exit 0
     elif [[ "$(echo "$ARG" | grep -icP '^(p|path)$')" == '1' ]]; then
         i="$(( i+1 ))"
         SUB_DIR="${!i}"
