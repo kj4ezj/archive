@@ -106,6 +106,9 @@ $ archive [OPTIONS] [FILENAME]
             Set the default view mode to "single page (facing)" in "Document
             Reader" or xreader.
 
+    -s, --split-multi-page-pdfs
+            Split all multi-page PDFs in the current directory, then exit.
+
     -v, --version
             Print the script version with debug info and exit.
 
@@ -180,6 +183,10 @@ function multi-page-pdf-util {
         # if it's a multi-page PDF, print the filename
         if (( PAGE_COUNT > 1 )); then
             printf " %3d    %s\n" "$PAGE_COUNT" "${FILE/#.\//}"
+            if [[ "$1" == 'split' ]]; then # split multi-page PDFs
+                pdfseparate "$FILE" "${FILE%%.[pP][dD][fF]}_%d.pdf"
+                rm "$FILE"
+            fi
         fi
     done
     exit 0
@@ -237,6 +244,8 @@ for (( i=1; i <= $#; i++)); do
         ARCHIVE_ROTATION='0'
     elif [[ "$(echo "$ARG" | grep -icP '^(1|single*)$')" == '1' ]]; then
         ARCHIVE_VIEW_MODE='single'
+    elif [[ "$(echo "$ARG" | grep -icP '^(s|split|split-?(multi-?page-?)?pdfs?)$')" == '1' ]]; then
+        multi-page-pdf-util 'split'
     elif [[ "$(echo "$ARG" | grep -icP '^(v|version)$')" == '1' ]]; then
         log-version-and-exit
     else
