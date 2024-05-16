@@ -393,8 +393,7 @@ if file-exists "$SERVER" "$REMOTE_PATH"; then
     ls-remote "$SERVER" "$REMOTE_PATH"
     log 'Pulling file...'
     pull "$TARGET_PATH" "$FILENAME"
-    log 'File NOT archived! Decide what to keep and send it with this command:'
-    log "$ rsync -Ptv '$FILENAME' '$TARGET_PATH'"
+    fail "File NOT archived!\e[0m\n\e[31mDecide what to keep and send it with this command:\e[0m\n$ rsync -Ptv '$FILENAME' '$TARGET_PATH'" 11
 else
     log "File '$FILENAME' does not exist at '$TARGET_PATH'."
     # get date and date parts
