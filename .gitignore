@@ -48,13 +48,17 @@ tmp
 
 # data files
 *.csv
+*.dat
+*.data
 *.db
 *.dbf
+*.dif
 *.fods
 *.json
+*.jsonc
 *.ods
-*.odt
 *.ots
+*.slk
 *.sqlite
 *.tsv
 *.uos
@@ -64,6 +68,42 @@ tmp
 *.xlt
 *.xltx
 *.xml
+
+# documents
+*.doc
+*.docm
+*.docx
+*.dot
+*.dotm
+*.dotx
+*.epub
+*.fodp
+*.fodt
+*.htm
+*.html
+*.mobi
+*.odg
+*.odp
+*.otp
+*.odt
+*.pdf
+*.pot
+*.potm
+*.potx
+*.pps
+*.ppsx
+*.ppt
+*.pptm
+*.pptx
+*.ps
+*.rtf
+*.txt
+*.uop
+*.uos
+*.uot
+*.wpd
+*.wps
+*.xhtml
 
 # editor files
 .ccls-cache
@@ -98,6 +138,30 @@ Thumbs.db
 thumbs.db:encryptable
 thumbs.db_encryptable
 .Trashes
+
+# fonts
+*.eot
+*.otf
+*.ttf
+*.woff
+*.woff2
+
+# images
+*.bitmap
+*.bmp
+*.gif
+*.ico
+*.jpeg
+*.jpg
+*.png
+*.psd
+*.raw
+*.svg
+*.tif
+*.tiff
+*.webp
+*.webm
+*.xcf
 
 # keys and certs
 *.cer
