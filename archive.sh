@@ -209,10 +209,12 @@ function merge-pdfs {
     # strip the suffix, if it exists
     BASE="${1%%_[0-9]*.pdf}"
     BASE="${BASE%.pdf}"
+    BASE="${BASE/#.\//}"
     MERGED="${BASE}.pdf"
     # find all parts in the series
     PARTS=()
     while IFS= read -r PDF_FILE < <(find . -maxdepth 1 -type f -iname "${BASE}_*.pdf" | sort -V); do
+        PDF_FILE="${PDF_FILE/#.\//}"
         log "Found part '$PDF_FILE'."
         PARTS+=("$PDF_FILE")
     done
