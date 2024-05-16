@@ -93,7 +93,7 @@ $ archive [OPTIONS] [FILENAME]
     -l, --license
             Print software license and exit.
 
-    -m  --list-multi-page-pdfs
+        --list-multi-page-pdfs
             List all multi-page PDFs in the current directory, then exit.
 
     -p, --path
@@ -242,7 +242,7 @@ for (( i=1; i <= $#; i++)); do
     ARG="$(echo "${!i}" | tr -d '-')"
     if [[ "$(echo "$ARG" | grep -icP '^(2|dual*)$')" == '1' ]]; then
         ARCHIVE_VIEW_MODE='dual'
-    elif [[ "$(echo "$ARG" | grep -icP '^(m|list-?multi-?page-?pdfs?)$')" == '1' ]]; then
+    elif [[ "$(echo "$ARG" | grep -icP '^(list-?multi-?(page)?-?(pdfs?)?)$')" == '1' ]]; then
         multi-page-pdf-util 'list'
         exit 0
     elif [[ "$(echo "$ARG" | grep -icP '^(p|path)$')" == '1' ]]; then
