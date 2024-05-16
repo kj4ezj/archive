@@ -229,9 +229,9 @@ function merge-pdfs {
     # merge PDFs
     PDFUNITE_CMD='pdfunite'
     for PART in "${PARTS[@]}"; do
-        PDF_FILE="${PDF_FILE/#.\//}"
+        PDF_FILE="${PART/#.\//}"
         log "Found part '$PDF_FILE'."
-        PDFUNITE_CMD+=" '$PART'"
+        PDFUNITE_CMD+=" '$PDF_FILE'"
     done
     PDFUNITE_CMD+=" '$MERGED'"
     conditional-ee "$PDFUNITE_CMD" || EXIT_STATUS="$?"
