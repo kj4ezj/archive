@@ -8,11 +8,13 @@ export GIT_VERSION='' # populated by make install
 
 # run a command if dry-run is not set
 function conditional-ee {
+    EXIT_STATUS='0'
     if [[ -z "$ARCHIVE_DRY_RUN" ]]; then
-        ee "$1"
+        ee "$1" || EXIT_STATUS="$?"
     else
         echo "$ $1"
     fi
+    return "$EXIT_STATUS"
 }
 
 # count PDF pages
