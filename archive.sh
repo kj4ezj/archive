@@ -223,9 +223,13 @@ function merge-pdfs {
     BASE="${BASE%.pdf}"
     BASE="${BASE/#.\//}"
     MERGED="${BASE}.pdf"
+    PDFUNITE_CMD='pdfunite'
     # handle edge-case where example_1.pdf is named example.pdf
     if [[ -f "${BASE}.pdf" && ! -f "${BASE}_1.pdf" ]]; then
         conditional-ee "mv '${BASE}.pdf' '${BASE}_1.pdf'" || fail "ERROR: Failed to rename '${BASE}.pdf' to '${BASE}_1.pdf'! mv returned exit status '$?'." "$?"
+        if [[ -n "$ARCHIVE_DRY_RUN" ]]; then
+            PDFUNITE_CMD+=" '${BASE}_1.pdf'"
+        fi
     elif [[ -f "${BASE}.pdf" && -f "${BASE}_1.pdf" ]]; then
         fail "ERROR: Both '${BASE}.pdf' and '${BASE}_1.pdf' exist! Rename or delete one of them." 15
     fi
@@ -235,7 +239,6 @@ function merge-pdfs {
         fail "ERROR: No PDFs found in the series for '$1'!" 12
     fi
     # merge PDFs
-    PDFUNITE_CMD='pdfunite'
     for PART in "${PARTS[@]}"; do
         log "Found part '$PART'."
         PDFUNITE_CMD+=" '$PART'"
