@@ -179,11 +179,12 @@ function ls-remote {
 # list all multi-page PDFs in the current directory, ignoring file extension case and ignoring subdirectories
 function multi-page-pdf-util {
     find . -maxdepth 1 -type f -iname '*.pdf' | sort | while IFS= read -r FILE; do
+        FILE="${FILE/#.\//}"
         PAGE_COUNT="$(count-pages "$FILE")"
         # if it's a multi-page PDF, print the filename
         if (( PAGE_COUNT > 1 )); then
             if [[ "$1" == 'list' ]]; then # split multi-page PDFs
-                printf " %3d    %s\n" "$PAGE_COUNT" "${FILE/#.\//}"
+                printf " %3d    %s\n" "$PAGE_COUNT" "$FILE"
             elif [[ "$1" == 'split' ]]; then # split multi-page PDFs
                 conditional-ee "pdfseparate '$FILE' '${FILE%%.[pP][dD][fF]}_%d.pdf'"
                 conditional-ee "rm '$FILE'"
