@@ -226,7 +226,7 @@ function merge-pdfs {
     # find all parts in the series and verify the series is not empty
     mapfile -t PARTS < <(find . -maxdepth 1 -type f -iname "${BASE}_*.pdf" | sort -V | sed 's_./__')
     if [[ "${#PARTS[@]}" == '0' ]]; then
-        fail "ERROR: No PDFs found in the series for '$1'!"
+        fail "ERROR: No PDFs found in the series for '$1'!" 12
     fi
     # merge PDFs
     PDFUNITE_CMD='pdfunite'
@@ -235,14 +235,10 @@ function merge-pdfs {
         PDFUNITE_CMD+=" '$PART'"
     done
     PDFUNITE_CMD+=" '$MERGED'"
-    conditional-ee "$PDFUNITE_CMD" || EXIT_STATUS="$?"
-    # check if the merge was successful
-    if [[ "$EXIT_STATUS" != '0' ]]; then
-        fail "ERROR: Failed to merge the PDF parts! pdfunite returned exit code $EXIT_STATUS."
-    fi
+    conditional-ee "$PDFUNITE_CMD" || fail "ERROR: Failed to merge the PDF parts! pdfunite returned exit code '$?'." "$?"
     # remove the parts after merging
     for PART in "${PARTS[@]}"; do
-        conditional-ee "rm '$PART'"
+        conditional-ee "rm '$PART'" || fail "ERROR: Failed to delete partial PDF '$PART' after merging! rm returned exit code '$?'." "$?"
     done
     log "\e[32mMerged PDFs into '$MERGED'.\e[0m"
 }
