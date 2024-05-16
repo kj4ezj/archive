@@ -82,28 +82,29 @@ $ archive [OPTIONS] [FILENAME]
 
 [OPTIONS] - command-line arguments to change behavior
         --dry-run
-        Run through the process without performing write operations.
+            Run through the process without performing write operations.
 
     -2, --dual
-        Set the default view mode to "two-up (facing)" in "Document Reader."
+            Set the default view mode to "two-up (facing)" in "Document Reader."
 
     -h, --help, -?
-        Print this help message and exit.
+            Print this help message and exit.
 
     -l, --license
-        Print software license and exit.
+            Print software license and exit.
 
     -p, --path
-        Specify the subdirectory to archive to, appended to ARCHIVE_TARGET.
+            Specify the subdirectory to archive to, appended to ARCHIVE_TARGET.
 
     -r, --rotation
-        Set the default rotation to 0° in "Document Reader."
+            Set the default rotation to 0° in "Document Reader."
 
     -1, --single
-        Set the default view mode to "single page (facing)" in "Document Reader."
+            Set the default view mode to "single page (facing)" in "Document
+            Reader" or xreader.
 
     -v, --version
-        Print the script version with debug info and exit.
+            Print the script version with debug info and exit.
 
 [VARIABLES] - configurable environment variables
     ARCHIVE_DRY_RUN
