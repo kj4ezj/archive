@@ -298,7 +298,6 @@ for (( i=1; i <= $#; i++)); do
     ARG="$(echo "${!i}" | tr -d '-')"
     if [[ "$(echo "$ARG" | grep -icP '^(dry-?run)$')" == '1' ]]; then
         export ARCHIVE_DRY_RUN='true'
-        log 'DRY_RUN SET.'
     elif [[ "$(echo "$ARG" | grep -icP '^(h|help|[?])$')" == '1' ]]; then
         log-help-and-exit
     elif [[ "$(echo "$ARG" | grep -icP '^(l|license)$')" == '1' ]]; then
@@ -307,6 +306,9 @@ for (( i=1; i <= $#; i++)); do
         log-version-and-exit
     fi
 done
+if [[ -n "$ARCHIVE_DRY_RUN" ]]; then
+    log '\e[1m\e[33mDRY-RUN SET.\e[0m'
+fi
 SUB_DIR="$ARCHIVE_PATH_DEFAULT"
 for (( i=1; i <= $#; i++)); do
     ARG="$(echo "${!i}" | tr -d '-')"
