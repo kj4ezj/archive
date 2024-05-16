@@ -273,15 +273,15 @@ function multi-page-pdf-util {
 # pull a file from the server
 function pull {
     if [[ -f "$2" ]]; then
-        ee "rsync $ARCHIVE_RSYNC_FLAGS '$1' '$2_$(date '+%s')'"
+        ee "rsync $ARCHIVE_RSYNC_FLAGS '$1' '$2_$(date '+%s')'" || fail "ERROR: Failed to pull '$1'! rsync returned exit code '$?'." "$?"
     else
-        ee "rsync $ARCHIVE_RSYNC_FLAGS '$1' '$2'"
+        ee "rsync $ARCHIVE_RSYNC_FLAGS '$1' '$2'" || fail "ERROR: Failed to pull '$1'! rsync returned exit code '$?'." "$?"
     fi
 }
 
 # push a file to the server
 function push {
-    ee "rsync $ARCHIVE_RSYNC_FLAGS '$1' '$2'"
+    ee "rsync $ARCHIVE_RSYNC_FLAGS '$1' '$2'" || fail "ERROR: Failed to push '$1' to '$2'! rsync returned exit code '$?'." "$?"
 }
 
 # set xreader view mode to "two-up (facing)"
