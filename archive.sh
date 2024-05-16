@@ -20,6 +20,14 @@ function count-pages {
     echo "$PAGE_COUNT"
 }
 
+# fail with a useful error
+function fail {
+    log "\e[1;31m$1\e[0m"
+    log 'Documentation: https://github.com/kj4ezj/archive'
+    log 'Exiting...'
+    exit "${2:-1}"
+}
+
 # test if a file exists
 function file-exists {
     if ee "ssh '$1' \"[[ -f '$2' ]]\""; then
@@ -95,6 +103,9 @@ $ archive [OPTIONS] [FILENAME]
 
         --list-multi-page-pdfs
             List all multi-page PDFs in the current directory, then exit.
+
+    -m, --merge
+            Merge a series of PDFs into one.
 
     -p, --path
             Specify the subdirectory to archive to, appended to ARCHIVE_TARGET.
@@ -176,6 +187,40 @@ function ls-remote {
     ee "ssh '$1' \"ls -la $2\"" || return "$?"
 }
 
+# given a series of PDFs, merge them into one
+function merge-pdfs {
+    # strip the suffix, if it exists
+    BASE="${1%%_[0-9]*.pdf}"
+    BASE="${BASE%.pdf}"
+    MERGED="${BASE}.pdf"
+    # find all parts in the series
+    PARTS=()
+    while IFS= read -r FILE < <(find . -maxdepth 1 -type f -iname "${BASE}_*.pdf" | sort -V); do
+        log "Found part '$FILE'."
+        PARTS+=("$FILE")
+    done
+    # check if the series exists
+    if [[ ${#PARTS[@]} -eq 0 ]]; then
+        fail "ERROR: No PDFs found in the series for '$1'!"
+    fi
+    # merge PDFs
+    PDFUNITE_CMD='pdfunite'
+    for PART in "${PARTS[@]}"; do
+        PDFUNITE_CMD+=" '$PART'"
+    done
+    PDFUNITE_CMD+=" '$MERGED'"
+    conditional-ee "$PDFUNITE_CMD" || EXIT_STATUS="$?"
+    # check if the merge was successful
+    if [[ "$EXIT_STATUS" != '0' ]]; then
+        fail "ERROR: Failed to merge the PDF parts! pdfunite returned exit code $?."
+    fi
+    # remove the parts after merging
+    for PART in "${PARTS[@]}"; do
+        conditional-ee "rm '$PART'"
+    done
+    log "Merged PDFs into '$MERGED'."
+}
+
 # list all multi-page PDFs in the current directory, ignoring file extension case and ignoring subdirectories
 function multi-page-pdf-util {
     find . -maxdepth 1 -type f -iname '*.pdf' | sort | while IFS= read -r FILE; do
@@ -244,6 +289,9 @@ for (( i=1; i <= $#; i++)); do
         ARCHIVE_VIEW_MODE='dual'
     elif [[ "$(echo "$ARG" | grep -icP '^(list-?multi-?(page)?-?(pdfs?)?)$')" == '1' ]]; then
         multi-page-pdf-util 'list'
+        exit 0
+    elif [[ "$(echo "$ARG" | grep -icP '^(m|merge-?(pdfs?)?)$')" == '1' ]]; then
+        merge-pdfs "${!i}"
         exit 0
     elif [[ "$(echo "$ARG" | grep -icP '^(p|path)$')" == '1' ]]; then
         i="$(( i+1 ))"
