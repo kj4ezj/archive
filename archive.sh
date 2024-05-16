@@ -23,6 +23,16 @@ function count-pages {
     echo "$PAGE_COUNT"
 }
 
+# exit success
+function exit-success {
+    if [[ -n "$ARCHIVE_DRY_RUN" ]]; then
+        log '\e[1m\e[32mDone.\e[0m - \e[1m\e[33mDRY-RUN\e[0m'
+    else
+        log '\e[1m\e[32mDone.\e[0m'
+    fi
+    exit 0
+}
+
 # fail with a useful error
 function fail {
     log "\e[1;31m$1\e[0m"
@@ -336,12 +346,12 @@ for (( i=1; i <= $#; i++)); do
         ARCHIVE_VIEW_MODE='dual'
     elif [[ "$(echo "$ARG" | grep -icP '^(list-?multi-?(page)?-?(pdfs?)?)$')" == '1' ]]; then
         multi-page-pdf-util 'list'
-        exit 0
+        exit-success
     elif [[ "$(echo "$ARG" | grep -icP '^(merge-?(pdf)?)$')" == '1' ]]; then
         MERGE_SINGLE='true'
     elif [[ "$(echo "$ARG" | grep -icP '^(m|merge-?((all)?-?pdfs)?)$')" == '1' ]]; then
         merge-multiple
-        exit 0
+        exit-success
     elif [[ "$(echo "$ARG" | grep -icP '^(p|path)$')" == '1' ]]; then
         i="$(( i+1 ))"
         SUB_DIR="${!i}"
@@ -352,7 +362,7 @@ for (( i=1; i <= $#; i++)); do
     elif [[ "$(echo "$ARG" | grep -icP '^(s|split|split-?(multi-?page-?)?pdfs?)$')" == '1' ]]; then
         multi-page-pdf-util 'list'
         multi-page-pdf-util 'split'
-        exit 0
+        exit-success
     else
         FILENAME="${!i}"
     fi
@@ -360,7 +370,7 @@ done
 # run single PDF merge, if requested
 if [[ "$MERGE_SINGLE" == 'true' ]]; then
     merge-pdfs "$FILENAME"
-    exit 0
+    exit-success
 fi
 # get SSH server
 SERVER="$(echo "$ARCHIVE_TARGET" | cut -d ':' -f '1')"
@@ -426,7 +436,7 @@ else
     read -rp "Press [Enter] to delete the local copy of '$FILENAME'..."
     rm "$FILENAME"
 fi
-log 'Done.'
+exit-success
 
 # https://github.com/kj4ezj/archive
 
