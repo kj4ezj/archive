@@ -323,6 +323,7 @@ for (( i=1; i <= $#; i++)); do
         log-version-and-exit
     fi
 done
+log 'Begin.'
 if [[ -n "$ARCHIVE_DRY_RUN" ]]; then
     log '\e[1m\e[33mDRY-RUN SET.\e[0m'
 fi
@@ -356,7 +357,6 @@ for (( i=1; i <= $#; i++)); do
         FILENAME="${!i}"
     fi
 done
-log 'Begin.'
 # run single PDF merge, if requested
 if [[ "$MERGE_SINGLE" == 'true' ]]; then
     merge-pdfs "$FILENAME"
