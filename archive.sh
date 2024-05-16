@@ -107,7 +107,7 @@ $ archive [OPTIONS] [FILENAME]
     -l, --license
             Print software license and exit.
 
-        --list-multi-page-pdfs
+        --list-multi-page-pdfs, --list-multi
             List all multi-page PDFs in the current directory, then exit.
 
     -m, --merge
