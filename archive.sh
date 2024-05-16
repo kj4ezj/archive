@@ -5,6 +5,15 @@ export GIT_BRANCH=''  # populated by make install
 export GIT_ORIGIN=''  # populated by make install
 export GIT_VERSION='' # populated by make install
 
+# run a command if dry-run is not set
+function conditional-ee {
+    if [[ -z "$ARCHIVE_DRY_RUN" ]]; then
+        ee "$1"
+    else
+        echo "$ $1"
+    fi
+}
+
 # count PDF pages
 function count-pages {
     PAGE_COUNT="$(pdfinfo "$1" | grep 'Pages' | awk '{print $2}')"
@@ -72,6 +81,9 @@ documents.
 $ archive [OPTIONS] [FILENAME]
 
 [OPTIONS] - command-line arguments to change behavior
+        --dry-run
+        Run through the process without performing write operations.
+
     -2, --dual
         Set the default view mode to "two-up (facing)" in "Document Reader."
 
@@ -94,6 +106,9 @@ $ archive [OPTIONS] [FILENAME]
         Print the script version with debug info and exit.
 
 [VARIABLES] - configurable environment variables
+    ARCHIVE_DRY_RUN
+        If set, the script will not perform write operations.
+
     ARCHIVE_PATH_DEFAULT
         The default subdirectory to archive to, appended to ARCHIVE_TARGET.
 
@@ -170,17 +185,17 @@ function push {
 
 # set xreader view mode to "two-up (facing)"
 function set-view-dual {
-    ee "ssh '$1' \"gio set '$2' metadata::xreader::dual-page-odd-left 1\""
+    conditional-ee "ssh '$1' \"gio set '$2' metadata::xreader::dual-page-odd-left 1\""
 }
 
 # set xreader rotation
 function set-view-rotation {
-    ee "ssh '$1' \"gio set '$2' metadata::xreader::rotation $3\""
+    conditional-ee "ssh '$1' \"gio set '$2' metadata::xreader::rotation $3\""
 }
 
 # set xreader view mode to "single page (facing)"
 function set-view-single {
-    ee "ssh '$1' \"gio set '$2' metadata::xreader::sizing_mode best-fit\""
+    conditional-ee "ssh '$1' \"gio set '$2' metadata::xreader::sizing_mode best-fit\""
 }
 
 # main
@@ -189,7 +204,9 @@ SUB_DIR="$ARCHIVE_PATH_DEFAULT"
 # parse args
 for (( i=1; i <= $#; i++)); do
     ARG="$(echo "${!i}" | tr -d '-')"
-    if [[ "$(echo "$ARG" | grep -icP '^(2|dual*)$')" == '1' ]]; then
+    if [[ "$(echo "$ARG" | grep -icP '^(dry-?run)$')" == '1' ]]; then
+        ARCHIVE_DRY_RUN='true'
+    elif [[ "$(echo "$ARG" | grep -icP '^(2|dual*)$')" == '1' ]]; then
         ARCHIVE_VIEW_MODE='dual'
     elif [[ "$(echo "$ARG" | grep -icP '^(h|help|[?])$')" == '1' ]]; then
         log-help-and-exit
@@ -219,6 +236,10 @@ TARGET_PATH="${TARGET_DIR}/${FILENAME}"
 # parse rsync flags
 if [[ -z "$ARCHIVE_RSYNC_FLAGS" ]]; then
     ARCHIVE_RSYNC_FLAGS="$ARCHIVE_RSYNC_FLAGS_DEFAULT"
+fi
+# rsync dry-run
+if [[ -n "$ARCHIVE_DRY_RUN" ]]; then
+    ARCHIVE_RSYNC_FLAGS="${ARCHIVE_RSYNC_FLAGS} -n"
 fi
 # test if the file exists
 if file-exists "$SERVER" "$REMOTE_PATH"; then
