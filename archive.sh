@@ -395,7 +395,7 @@ if file-exists "$SERVER" "$REMOTE_PATH"; then
     pull "$TARGET_PATH" "$FILENAME"
     fail "File NOT archived!\e[0m\n\e[31mDecide what to keep and send it with this command:\e[0m\n$ rsync -Ptv '$FILENAME' '$TARGET_PATH'" 11
 else
-    log "File '$FILENAME' \e[32mdoes\e[0m not exist at '$TARGET_PATH'."
+    log "File '$FILENAME' \e[32mdoes not\e[0m exist at '$TARGET_PATH'."
     # get date and date parts
     DATE="$(echo "$FILENAME" | grep -oP '^\d{4}-\d{2}-\d{2}')"
     DD="$(echo "$DATE" | grep -oP '\d{2}' | sed -n '4p')"
