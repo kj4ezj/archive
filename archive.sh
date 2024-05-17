@@ -398,9 +398,11 @@ else
     log "File '$FILENAME' \e[32mdoes not\e[0m exist at '$TARGET_PATH'."
     # get date and date parts
     DATE="$(echo "$FILENAME" | grep -oP '^\d{4}-\d{2}-\d{2}')"
-    DD="$(echo "$DATE" | grep -oP '\d{2}' | sed -n '4p')"
+    DD="$(echo "$DATE" | grep -oP '\d{2}' | sed -n '4p' | sed 's/^0*//')"
+    DD_MINUS="$(echo "$DD - 1" | bc)"
+    DD_PLUS="$(echo "$DD + 1" | bc)"
     MONTH="$(echo "$DATE" | grep -oP '^\d{4}-\d{2}')"
-    RANGE="{$(( DD-1 )),$DD,$(( DD+1 ))}"
+    RANGE="$(printf "{%02d,%02d,%02d}" "$DD_MINUS" "$DD" "$DD_PLUS")"
     YEAR="$(echo "$DATE" | grep -oP '^\d{4}')"
     # list neighbor files
     NEIGHBOR_FILES="$(ls-remote "$SERVER" "${REMOTE_DIR}/${MONTH}-${RANGE}*")"
