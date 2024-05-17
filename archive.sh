@@ -278,7 +278,7 @@ function multi-page-pdf-util {
             elif [[ "$1" == 'split' ]]; then # split multi-page PDFs
                 conditional-ee "pdfseparate '$PDF_FILE' '${PDF_FILE%%.[pP][dD][fF]}_%d.pdf'" || fail "ERROR: Failed to split '$PDF_FILE'! pdfseparate returned exit code '$?'." "$?"
                 conditional-ee "rm '$PDF_FILE'" || fail "ERROR: Failed to delete '$PDF_FILE' after splitting! rm returned exit code '$?'." "$?"
-                log "\e[32mSplit '$FILE'.\e[0m"
+                log "\e[32mSplit '$PDF_FILE'.\e[0m"
             fi
         fi
     done < <(find . -maxdepth 1 -type f -iname '*.pdf' | sort)
