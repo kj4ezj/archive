@@ -292,7 +292,7 @@ function multi-page-pdf-util {
 # pull a file from the server
 function pull {
     if [[ -f "$2" ]]; then
-        ee "rsync $ARCHIVE_RSYNC_FLAGS '$1' '$2_$(date '+%s')'" || fail "ERROR: Failed to pull '$1'! rsync returned exit code '$?'." "$?"
+        ee "rsync $ARCHIVE_RSYNC_FLAGS '$1' '${2%%.pdf}_$(date '+%s').pdf'" || fail "ERROR: Failed to pull '$1'! rsync returned exit code '$?'." "$?"
     else
         ee "rsync $ARCHIVE_RSYNC_FLAGS '$1' '$2'" || fail "ERROR: Failed to pull '$1'! rsync returned exit code '$?'." "$?"
     fi
