@@ -216,7 +216,7 @@ function log-version-and-exit {
 
 # list file(s) on the server
 function ls-remote {
-    ee "ssh '$1' \"ls -la $2\"" || return "$?"
+    ee "ssh '$1' \"ls -la $2\"" 2>/dev/null || :
 }
 
 # merge all sets of PDFs in the current directory
