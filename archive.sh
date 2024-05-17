@@ -403,7 +403,12 @@ else
     RANGE="{$(( DD-1 )),$DD,$(( DD+1 ))}"
     YEAR="$(echo "$DATE" | grep -oP '^\d{4}')"
     # list neighbor files
-    ls-remote "$SERVER" "${REMOTE_DIR}/${MONTH}-${RANGE}*" || ls-remote "$SERVER" "${REMOTE_DIR}/${MONTH}*" || ls-remote "$SERVER" "${REMOTE_DIR}/${YEAR}*"
+    NEIGHBOR_FILES="$(ls-remote "$SERVER" "${REMOTE_DIR}/${MONTH}-${RANGE}*")"
+    if [[ -n "$NEIGHBOR_FILES" ]]; then
+        echo "$NEIGHBOR_FILES"
+    else
+        ls-remote "$SERVER" "${REMOTE_DIR}/${MONTH}*" || (ls-remote "$SERVER" "${REMOTE_DIR}/${YEAR}*" || :)
+    fi
     # archive file
     log "Archiving '$FILENAME'..."
     push "$FILENAME" "$TARGET_PATH"
