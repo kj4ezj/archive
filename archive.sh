@@ -436,7 +436,7 @@ fi
 FILE_EXISTS='false'
 if file-exists "$SERVER" "$REMOTE_PATH"; then
     FILE_EXISTS='true'
-    log "\e[1m\e[33mNOTICE: File '$FILENAME' already exists at '$TARGET_PATH'.\e[0m"
+    log "\e[1m\e[33mNOTICE: File '$FILENAME' already exists in '$SUB_DIR'.\e[0m"
     ls-remote "$SERVER" "$REMOTE_PATH"
 fi
 # archive the file
@@ -445,7 +445,7 @@ if [[ "$FILE_EXISTS" == 'true' && "$ARCHIVE_FORCE" != 'true' ]]; then
     pull "$TARGET_PATH" "$FILENAME"
     fail "File NOT archived!\e[0m\n\e[31mDecide what to keep and re-run with \"--force\" to overwrite the destination file." 11
 else
-    log "File '$FILENAME' \e[32mdoes not\e[0m exist at '$TARGET_PATH'."
+    log "File '$FILENAME' \e[32mdoes not\e[0m exist in '$SUB_DIR'."
     # get date and date parts
     DATE="$(echo "$FILENAME" | grep -oP '^\d{4}-\d{2}-\d{2}')"
     DD="$(echo "$DATE" | grep -oP '\d{2}' | sed -n '4p' | sed 's/^0*//')"
