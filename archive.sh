@@ -243,15 +243,15 @@ function merge-pdfs {
     MERGED="${BASE}.pdf"
     PDFUNITE_CMD='pdfunite'
     # handle edge-cases
-    if [[ -f "${BASE}.pdf" && ! -f "${BASE}_1.pdf" ]]; then # example_1.pdf is named example.pdf
-        conditional-ee "mv '${BASE}.pdf' '${BASE}_1.pdf'" || fail "ERROR: Failed to rename '${BASE}.pdf' to '${BASE}_1.pdf'! mv returned exit status '$?'." "$?"
+    if [[ -f "$MERGED" && ! -f "${BASE}_1.pdf" ]]; then # example_1.pdf is named example.pdf
+        conditional-ee "mv '$MERGED' '${BASE}_1.pdf'" || fail "ERROR: Failed to rename '$MERGED' to '${BASE}_1.pdf'! mv returned exit status '$?'." "$?"
         if [[ -n "$ARCHIVE_DRY_RUN" ]]; then
             PDFUNITE_CMD+=" '${BASE}_1.pdf'"
         fi
-    elif [[ -f "${BASE}.pdf" && -f "${BASE}_1.pdf" && "$ARCHIVE_FORCE" == 'true' ]]; then # "--force" is set, overwrite existing output file
-        conditional-ee "rm '${BASE}.pdf'" || fail "ERROR: Failed to delete '${BASE}.pdf'! rm returned exit code '$?'." "$?"
-    elif [[ -f "${BASE}.pdf" && -f "${BASE}_1.pdf" ]]; then
-        fail "ERROR: Both '${BASE}.pdf' and '${BASE}_1.pdf' exist! Rename or delete one of them." 15
+    elif [[ -f "$MERGED" && -f "${BASE}_1.pdf" && "$ARCHIVE_FORCE" == 'true' ]]; then # "--force" is set, overwrite existing output file
+        conditional-ee "rm '$MERGED'" || fail "ERROR: Failed to delete '$MERGED'! rm returned exit code '$?'." "$?"
+    elif [[ -f "$MERGED" && -f "${BASE}_1.pdf" ]]; then
+        fail "ERROR: Both '$MERGED' and '${BASE}_1.pdf' exist! Rename or delete one of them." 15
     fi
     # find all parts in the series and verify the series is not empty
     mapfile -t PARTS < <(find . -maxdepth 1 -type f -iname "${BASE}_*.pdf" | sort -V | sed 's_./__')
