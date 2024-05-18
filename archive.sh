@@ -242,7 +242,7 @@ function merge-multiple {
         BASE="$(get-base-name "$FILE")"
         if [[ -z "${MERGED_SERIES[$BASE]}" ]]; then
             MERGED_SERIES["$BASE"]='true'
-            log "Found series: '$BASE'"
+            log "\e[1mFound series: '$BASE'\e[0m"
             merge-pdfs "$BASE"
         fi
     done
