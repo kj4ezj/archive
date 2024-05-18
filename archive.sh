@@ -246,6 +246,12 @@ function merge-multiple {
             merge-pdfs "$BASE"
         fi
     done
+    # check if any series were merged
+    if [[ "${#MERGED_SERIES[@]}" == '0' ]]; then
+        fail "ERROR: No series found to merge!" 16
+    else
+        log "Merged ${#MERGED_SERIES[@]} series."
+    fi
 }
 
 # given a series of PDFs, merge them into one
