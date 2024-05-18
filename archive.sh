@@ -236,8 +236,15 @@ function ls-remote {
 
 # merge all sets of PDFs in the current directory
 function merge-multiple {
-    for FILE in *_2.pdf; do
-        merge-pdfs "${FILE/#.\//}"
+    declare -A MERGED_SERIES
+    mapfile -t PDF_FILES < <(find . -maxdepth 1 -type f -iname '*_*.pdf' | sort -V)
+    for FILE in "${PDF_FILES[@]}"; do
+        BASE="$(get-base-name "$FILE")"
+        if [[ -z "${MERGED_SERIES[$BASE]}" ]]; then
+            MERGED_SERIES["$BASE"]='true'
+            log "Found series: '$BASE'"
+            merge-pdfs "$BASE"
+        fi
     done
 }
 
@@ -247,6 +254,7 @@ function merge-pdfs {
     BASE_PART_1="${BASE}_1.pdf"
     MERGED="${BASE}.pdf"
     PDFUNITE_CMD='pdfunite'
+    log "Merging '$BASE' series..."
     # handle edge-cases
     if [[ -f "$MERGED" && ! -f "$BASE_PART_1" ]]; then # example_1.pdf is named example.pdf
         conditional-ee "mv '$MERGED' '$BASE_PART_1'" || fail "ERROR: Failed to rename '$MERGED' to '$BASE_PART_1'! mv returned exit status '$?'." "$?"
