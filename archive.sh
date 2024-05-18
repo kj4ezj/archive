@@ -385,6 +385,10 @@ if [[ "$MERGE_SINGLE" == 'true' ]]; then
     merge-pdfs "$FILENAME"
     exit-success
 fi
+# verify file exists
+if [[ ! -f "$FILENAME" ]]; then
+    fail "ERROR: File '$FILENAME' does not exist!" 10
+fi
 # get SSH server
 SERVER="$(echo "$ARCHIVE_TARGET" | cut -d ':' -f '1')"
 # get target directory
