@@ -39,7 +39,7 @@ This is the recommended installation method.
 
 Install the [echo-eval](https://github.com/kj4ezj/echo-eval) dependency.
 ```bash
-sudo bpkg install -g kj4ezj/ee
+sudo bpkg install -g kj4ezj/ee@dim
 ```
 Then, install this tool using `bpkg`.
 ```bash
