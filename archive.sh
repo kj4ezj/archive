@@ -465,7 +465,7 @@ else
     log "Archiving '$FILENAME'..."
     push "$FILENAME" "$TARGET_PATH"
     # set "Document Reader" default view mode
-    log 'Setting default view mode for "Document Reader."'
+    log 'Setting default view mode for Document Reader.'
     if [[ -z "$ARCHIVE_VIEW_MODE" ]]; then
         PAGE_COUNT="$(count-pages "$FILENAME")"
         log "Found $PAGE_COUNT page PDF."
@@ -484,7 +484,7 @@ else
     fi
     # set "Document Reader" default rotation
     if [[ -n "$ARCHIVE_ROTATION" ]]; then
-        log 'Setting default rotation for "Document Reader."'
+        log 'Setting default rotation for Document Reader.'
         set-view-rotation "$SERVER" "$REMOTE_PATH" "$ARCHIVE_ROTATION"
         log "\e[35mDefault rotation set to $ROTATION°.\e[0m"
     fi
