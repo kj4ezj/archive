@@ -116,6 +116,9 @@ $ archive [OPTIONS] [FILENAME]
     -h, --help, -?
             Print this help message and exit.
 
+    -k, --keep, --keep-local-copy
+            Keep the input file, do not delete anything.
+
     -l, --license
             Print software license and exit.
 
@@ -256,9 +259,13 @@ function merge-pdfs {
     PDFUNITE_CMD+=" '$MERGED'"
     conditional-ee "$PDFUNITE_CMD" || fail "ERROR: Failed to merge the PDF parts! pdfunite returned exit code '$?'." "$?"
     # remove the parts after merging
-    for PART in "${PARTS[@]}"; do
-        conditional-ee "rm '$PART'" || fail "ERROR: Failed to delete partial PDF '$PART' after merging! rm returned exit code '$?'." "$?"
-    done
+    if [[ -z "$ARCHIVE_KEEP_LOCAL_COPY" ]]; then
+        for PART in "${PARTS[@]}"; do
+            conditional-ee "rm '$PART'" || fail "ERROR: Failed to delete partial PDF '$PART' after merging! rm returned exit code '$?'." "$?"
+        done
+    else
+        log 'Not deleting partial PDFs, "--keep" is set.'
+    fi
     log "\e[32mMerged PDFs into '$MERGED'.\e[0m"
 }
 
@@ -277,7 +284,11 @@ function multi-page-pdf-util {
                 printf " %3d    %s\n" "$PAGE_COUNT" "$PDF_FILE"
             elif [[ "$1" == 'split' ]]; then # split multi-page PDFs
                 conditional-ee "pdfseparate '$PDF_FILE' '${PDF_FILE%%.[pP][dD][fF]}_%d.pdf'" || fail "ERROR: Failed to split '$PDF_FILE'! pdfseparate returned exit code '$?'." "$?"
-                conditional-ee "rm '$PDF_FILE'" || fail "ERROR: Failed to delete '$PDF_FILE' after splitting! rm returned exit code '$?'." "$?"
+                if [[ -z "$ARCHIVE_KEEP_LOCAL_COPY" ]]; then
+                    conditional-ee "rm '$PDF_FILE'" || fail "ERROR: Failed to delete '$PDF_FILE' after splitting! rm returned exit code '$?'." "$?"
+                else
+                    log 'Not deleting original PDF, "--keep" is set.'
+                fi
                 log "\e[32mSplit '$PDF_FILE'.\e[0m"
             fi
         fi
@@ -344,6 +355,8 @@ for (( i=1; i <= $#; i++)); do
         export ARCHIVE_DRY_RUN='true'
     elif [[ "$(echo "$ARG" | grep -icP '^(2|dual*)$')" == '1' ]]; then
         ARCHIVE_VIEW_MODE='dual'
+    elif [[ "$(echo "$ARG" | grep -icP '^(k|keep|keep-?local(-?copy)?)$')" == '1' ]]; then
+        ARCHIVE_KEEP_LOCAL_COPY='true'
     elif [[ "$(echo "$ARG" | grep -icP '^(list-?multi-?(page)?-?(pdfs?)?)$')" == '1' ]]; then
         multi-page-pdf-util 'list'
         exit-success
@@ -438,11 +451,15 @@ else
         set-view-rotation "$SERVER" "$REMOTE_PATH" "$ARCHIVE_ROTATION"
         log "\e[35mDefault rotation set to $ROTATION°.\e[0m"
     fi
-    # pause for user, then delete local file
-    printf "Press [Enter] to delete the local copy of '%s'..." "$FILENAME"
-    [[ -n "$ARCHIVE_DRY_RUN" ]] && printf ' \e[1m\e[33m(DRY-RUN)\e[0m'
-    read -rp ' '
-    conditional-ee "rm '$FILENAME'" || fail "ERROR: Failed to delete '$FILENAME'! rm returned exit code '$?'." "$?"
+    if [[ -z "$ARCHIVE_KEEP_LOCAL_COPY" ]]; then
+        # pause for user, then delete local file
+        printf "Press [Enter] to delete the local copy of '%s'..." "$FILENAME"
+        [[ -n "$ARCHIVE_DRY_RUN" ]] && printf ' \e[1m\e[33m(DRY-RUN)\e[0m'
+        read -rp ' '
+        conditional-ee "rm '$FILENAME'" || fail "ERROR: Failed to delete '$FILENAME'! rm returned exit code '$?'." "$?"
+    else
+        log 'Not deleting local copy, "--keep" is set.'
+    fi
 fi
 exit-success
 
