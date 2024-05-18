@@ -12,7 +12,7 @@ function conditional-ee {
     if [[ -z "$ARCHIVE_DRY_RUN" ]]; then
         ee "$1" || EXIT_STATUS="$?"
     else
-        echo "$ $1"
+        printf "\e[2m$ %s\e[0m\n" "$1"
     fi
     return "$EXIT_STATUS"
 }
