@@ -50,6 +50,13 @@ function file-exists {
     fi
 }
 
+# given a PDF file, get the base name without a suffix or extension.
+function get-base-name {
+    BASE="${1%%_[0-9]*.pdf}"
+    BASE="${BASE%.pdf}"
+    echo "${BASE/#.\//}"
+}
+
 # populate the git branch, origin, and version
 function git-metadata {
     # branch
@@ -236,10 +243,7 @@ function merge-multiple {
 
 # given a series of PDFs, merge them into one
 function merge-pdfs {
-    # strip the suffix, if it exists
-    BASE="${1%%_[0-9]*.pdf}"
-    BASE="${BASE%.pdf}"
-    BASE="${BASE/#.\//}"
+    BASE="$(get-base-name "$1")"
     BASE_PART_1="${BASE}_1.pdf"
     MERGED="${BASE}.pdf"
     PDFUNITE_CMD='pdfunite'
