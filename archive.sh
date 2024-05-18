@@ -113,6 +113,11 @@ $ archive [OPTIONS] [FILENAME]
     -2, --dual
             Set the default view mode to "two-up (facing)" in "Document Reader."
 
+    -f, --force, --overwrite
+            Skip some safety checks and do what I say! Overwrite existing target
+            file during an archive, or overwrite existing merged PDF file during
+            a merge.
+
     -h, --help, -?
             Print this help message and exit.
 
@@ -237,12 +242,14 @@ function merge-pdfs {
     BASE="${BASE/#.\//}"
     MERGED="${BASE}.pdf"
     PDFUNITE_CMD='pdfunite'
-    # handle edge-case where example_1.pdf is named example.pdf
-    if [[ -f "${BASE}.pdf" && ! -f "${BASE}_1.pdf" ]]; then
+    # handle edge-cases
+    if [[ -f "${BASE}.pdf" && ! -f "${BASE}_1.pdf" ]]; then # example_1.pdf is named example.pdf
         conditional-ee "mv '${BASE}.pdf' '${BASE}_1.pdf'" || fail "ERROR: Failed to rename '${BASE}.pdf' to '${BASE}_1.pdf'! mv returned exit status '$?'." "$?"
         if [[ -n "$ARCHIVE_DRY_RUN" ]]; then
             PDFUNITE_CMD+=" '${BASE}_1.pdf'"
         fi
+    elif [[ -f "${BASE}.pdf" && -f "${BASE}_1.pdf" && "$ARCHIVE_FORCE" == 'true' ]]; then # "--force" is set, overwrite existing output file
+        conditional-ee "rm '${BASE}.pdf'" || fail "ERROR: Failed to delete '${BASE}.pdf'! rm returned exit code '$?'." "$?"
     elif [[ -f "${BASE}.pdf" && -f "${BASE}_1.pdf" ]]; then
         fail "ERROR: Both '${BASE}.pdf' and '${BASE}_1.pdf' exist! Rename or delete one of them." 15
     fi
@@ -336,6 +343,8 @@ for (( i=1; i <= $#; i++)); do
     ARG="$(echo "${!i}" | tr -d '-')"
     if [[ "$(echo "$ARG" | grep -icP '^(dry-?run)$')" == '1' ]]; then
         export ARCHIVE_DRY_RUN='true'
+    elif [[ "$(echo "$ARG" | grep -icP '^(f|force|overwrite)$')" == '1' ]]; then
+        export ARCHIVE_FORCE='true'
     elif [[ "$(echo "$ARG" | grep -icP '^(h|help|[?])$')" == '1' ]]; then
         log-help-and-exit
     elif [[ "$(echo "$ARG" | grep -icP '^(l|license)$')" == '1' ]]; then
@@ -405,12 +414,17 @@ if [[ -n "$ARCHIVE_DRY_RUN" ]]; then
     ARCHIVE_RSYNC_FLAGS="${ARCHIVE_RSYNC_FLAGS} -n"
 fi
 # test if the file exists
+FILE_EXISTS='false'
 if file-exists "$SERVER" "$REMOTE_PATH"; then
+    FILE_EXISTS='true'
     log "\e[1m\e[33mNOTICE: File '$FILENAME' already exists at '$TARGET_PATH'.\e[0m"
     ls-remote "$SERVER" "$REMOTE_PATH"
+fi
+# archive the file
+if [[ "$FILE_EXISTS" == 'true' && "$ARCHIVE_FORCE" != 'true' ]]; then
     log 'Pulling file...'
     pull "$TARGET_PATH" "$FILENAME"
-    fail "File NOT archived!\e[0m\n\e[31mDecide what to keep and send it with this command:\e[0m\n$ rsync -Ptv '$FILENAME' '$TARGET_PATH'" 11
+    fail "File NOT archived!\e[0m\n\e[31mDecide what to keep and re-run with \"--force\" to overwrite the destination file." 11
 else
     log "File '$FILENAME' \e[32mdoes not\e[0m exist at '$TARGET_PATH'."
     # get date and date parts
