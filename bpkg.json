@@ -12,7 +12,7 @@
     "archive.sh"
   ],
   "dependencies": {
-    "kj4ezj/ee": "main"
+    "kj4ezj/ee": "dim"
   },
   "commands": {
     "act": "act --artifact-server-path .github/artifacts",
