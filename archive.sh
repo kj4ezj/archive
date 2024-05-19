@@ -420,8 +420,8 @@ fi
 # get SSH server
 SERVER="$(echo "$ARCHIVE_TARGET" | cut -d ':' -f '1')"
 # get target directory
-REMOTE_DIR="$(echo "$ARCHIVE_TARGET" | cut -d ':' -f '2')/${SUB_DIR}"
-REMOTE_PATH="${REMOTE_DIR}/${FILENAME}"
+REMOTE_SUB_DIR="$(echo "$ARCHIVE_TARGET" | cut -d ':' -f '2')/${SUB_DIR}"
+REMOTE_PATH="${REMOTE_SUB_DIR}/${FILENAME}"
 TARGET_DIR="${ARCHIVE_TARGET}/${SUB_DIR}"
 TARGET_PATH="${TARGET_DIR}/${FILENAME}"
 # parse rsync flags
@@ -455,11 +455,11 @@ else
     RANGE="$(printf "{%02d,%02d,%02d}" "$DD_MINUS" "$DD" "$DD_PLUS")"
     YEAR="$(echo "$DATE" | grep -oP '^\d{4}')"
     # list neighbor files
-    NEIGHBOR_FILES="$(ls-remote "$SERVER" "${REMOTE_DIR}/${MONTH}-${RANGE}*")"
+    NEIGHBOR_FILES="$(ls-remote "$SERVER" "${REMOTE_SUB_DIR}/${MONTH}-${RANGE}*")"
     if [[ -n "$NEIGHBOR_FILES" ]]; then
         echo "$NEIGHBOR_FILES"
     else
-        ls-remote "$SERVER" "${REMOTE_DIR}/${MONTH}*" || (ls-remote "$SERVER" "${REMOTE_DIR}/${YEAR}*" || :)
+        ls-remote "$SERVER" "${REMOTE_SUB_DIR}/${MONTH}*" || (ls-remote "$SERVER" "${REMOTE_SUB_DIR}/${YEAR}*" || :)
     fi
     # archive file
     log "Archiving '$FILENAME'..."
