@@ -50,6 +50,11 @@ function file-exists {
     fi
 }
 
+# given a filename prefix, find all matching PDFs on the remote
+function find-pdf {
+    ee "ssh '$1' \"find '$2' -type f -iname '$3*.pdf'\"" || fail "ERROR: Failed to find '$3' files on '$1'! ssh returned exit code '$?'." "$?"
+}
+
 # given a PDF file, get the base name without a suffix or extension.
 function get-base-name {
     BASE="${1%%_[0-9]*.pdf}"
@@ -119,6 +124,9 @@ $ archive [OPTIONS] [FILENAME]
 
     -2, --dual
             Set the default view mode to "two-up (facing)" in "Document Reader."
+
+    -f, --find, --find-pdf  [FILENAME_PREFIX]
+            Find all PDFs on the server that match the given prefix.
 
         --force, --overwrite
             Skip some safety checks and do what I say! Overwrite existing target
@@ -383,6 +391,9 @@ for (( i=1; i <= $#; i++)); do
         export ARCHIVE_DRY_RUN='true'
     elif [[ "$(echo "$ARG" | grep -icP '^(2|dual*)$')" == '1' ]]; then
         ARCHIVE_VIEW_MODE='dual'
+    elif [[ "$(echo "$ARG" | grep -icP '^(f|find|find-pdf)$')" == '1' ]]; then
+        i="$(( i+1 ))"
+        ARCHIVE_FIND_PDF="${!i}"
     elif [[ "$(echo "$ARG" | grep -icP '^(k|keep|keep-?local(-?copy)?)$')" == '1' ]]; then
         ARCHIVE_KEEP_LOCAL_COPY='true'
     elif [[ "$(echo "$ARG" | grep -icP '^(list-?multi-?(page)?-?(pdfs?)?)$')" == '1' ]]; then
@@ -420,10 +431,16 @@ fi
 # get SSH server
 SERVER="$(echo "$ARCHIVE_TARGET" | cut -d ':' -f '1')"
 # get target directory
-REMOTE_SUB_DIR="$(echo "$ARCHIVE_TARGET" | cut -d ':' -f '2')/${SUB_DIR}"
+REMOTE_BASE_DIR="$(echo "$ARCHIVE_TARGET" | cut -d ':' -f '2')"
+REMOTE_SUB_DIR="${REMOTE_BASE_DIR}/${SUB_DIR}"
 REMOTE_PATH="${REMOTE_SUB_DIR}/${FILENAME}"
 TARGET_SUB_DIR="${ARCHIVE_TARGET}/${SUB_DIR}"
 TARGET_PATH="${TARGET_SUB_DIR}/${FILENAME}"
+# find a PDF, if requested
+if [[ -n "$ARCHIVE_FIND_PDF" ]]; then
+    find-pdf "$SERVER" "$REMOTE_BASE_DIR" "${ARCHIVE_FIND_PDF%.pdf}"
+    exit-success
+fi
 # parse rsync flags
 if [[ -z "$ARCHIVE_RSYNC_FLAGS" ]]; then
     ARCHIVE_RSYNC_FLAGS="$ARCHIVE_RSYNC_FLAGS_DEFAULT"
