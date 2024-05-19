@@ -432,10 +432,6 @@ if [[ "$MERGE_SINGLE" == 'true' ]]; then
     merge-pdfs "$FILENAME"
     exit-success
 fi
-# verify file exists
-if [[ ! -f "$FILENAME" ]]; then
-    fail "ERROR: File '$FILENAME' does not exist!" 10
-fi
 # get SSH server
 SERVER="$(echo "$ARCHIVE_TARGET" | cut -d ':' -f '1')"
 # get target directory
@@ -463,7 +459,11 @@ if [[ -n "$ARCHIVE_PULL" ]]; then
     pull "$TARGET_PATH" "$FILENAME"
     exit-success
 fi
-# test if the file exists
+# verify local file exists
+if [[ ! -f "$FILENAME" ]]; then
+    fail "ERROR: File '$FILENAME' does not exist!" 10
+fi
+# test if the remote file exists
 FILE_EXISTS='false'
 if file-exists "$SERVER" "$REMOTE_SUB_DIR" "$FILENAME"; then
     FILE_EXISTS='true'
