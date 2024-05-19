@@ -43,7 +43,9 @@ function fail {
 
 # case-insensitive test if a file exists on the remote
 function file-exists {
-    RESULT="$(ee "ssh '$1' \"find '$2' -maxdepth 1 -type f -iname '$3' -print -quit\"")"
+    COMMAND="ssh '$1' \"find '$2' -maxdepth 1 -type f -iname '$3' -print -quit\""
+    printf "\e[2m$ %s\e[0m\n" "$COMMAND"
+    RESULT="$(eval "$COMMAND")"
     if [[ -n "$RESULT" ]]; then
         return 0
     else
