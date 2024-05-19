@@ -41,9 +41,9 @@ function fail {
     exit "${2:-1}"
 }
 
-# test if a file exists
+# case-insensitive test if a file exists on the remote
 function file-exists {
-    if ee "ssh '$1' \"[[ -f '$2' ]]\""; then
+    if ee "ssh '$1' \"find '$2' -maxdepth 1 -type f -iname '$3' -print -quit\""; then
         return 0
     else
         return 1
@@ -462,7 +462,7 @@ if [[ -n "$ARCHIVE_PULL" ]]; then
 fi
 # test if the file exists
 FILE_EXISTS='false'
-if file-exists "$SERVER" "$REMOTE_PATH"; then
+if file-exists "$SERVER" "$REMOTE_SUB_DIR" "$FILENAME"; then
     FILE_EXISTS='true'
     log "\e[1m\e[33mNOTICE: File '$FILENAME' already exists in '$SUB_DIR'.\e[0m"
     ls-remote "$SERVER" "$REMOTE_PATH"
