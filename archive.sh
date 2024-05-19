@@ -120,7 +120,7 @@ $ archive [OPTIONS] [FILENAME]
     -2, --dual
             Set the default view mode to "two-up (facing)" in "Document Reader."
 
-    -f, --force, --overwrite
+        --force, --overwrite
             Skip some safety checks and do what I say! Overwrite existing target
             file during an archive, or overwrite existing merged PDF file during
             a merge.
@@ -362,7 +362,7 @@ for (( i=1; i <= $#; i++)); do
     ARG="$(echo "${!i}" | tr -d '-')"
     if [[ "$(echo "$ARG" | grep -icP '^(dry-?run)$')" == '1' ]]; then
         export ARCHIVE_DRY_RUN='true'
-    elif [[ "$(echo "$ARG" | grep -icP '^(f|force|overwrite)$')" == '1' ]]; then
+    elif [[ "$(echo "$ARG" | grep -icP '^(force|overwrite)$')" == '1' ]]; then
         export ARCHIVE_FORCE='true'
     elif [[ "$(echo "$ARG" | grep -icP '^(h|help|[?])$')" == '1' ]]; then
         log-help-and-exit
