@@ -154,6 +154,9 @@ $ archive [OPTIONS] [FILENAME]
     -p, --path  [SUBDIRECTORY]
             Specify the subdirectory to archive to, appended to ARCHIVE_TARGET.
 
+        --pull
+            Pull a file from the server.
+
     -r, --rotation
             Set the default rotation to 0° in "Document Reader."
 
@@ -407,6 +410,8 @@ for (( i=1; i <= $#; i++)); do
     elif [[ "$(echo "$ARG" | grep -icP '^(p|path)$')" == '1' ]]; then
         i="$(( i+1 ))"
         SUB_DIR="${!i}"
+    elif [[ "$(echo "$ARG" | grep -icP '^(pull)$')" == '1' ]]; then
+        ARCHIVE_PULL='true'
     elif [[ "$(echo "$ARG" | grep -icP '^(r|rotation)$')" == '1' ]]; then
         ARCHIVE_ROTATION='0'
     elif [[ "$(echo "$ARG" | grep -icP '^(1|single*)$')" == '1' ]]; then
@@ -448,6 +453,12 @@ fi
 # rsync dry-run
 if [[ -n "$ARCHIVE_DRY_RUN" ]]; then
     ARCHIVE_RSYNC_FLAGS="${ARCHIVE_RSYNC_FLAGS} -n"
+fi
+# pull a file from the server, if requested
+if [[ -n "$ARCHIVE_PULL" ]]; then
+    log 'Pulling file...'
+    pull "$TARGET_PATH" "$FILENAME"
+    exit-success
 fi
 # test if the file exists
 FILE_EXISTS='false'
