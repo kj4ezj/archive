@@ -151,7 +151,7 @@ $ archive [OPTIONS] [FILENAME]
     -m, --merge-pdfs, --merge-all-pdfs
             Merge all series of PDFs in the current directory, then exit.
 
-    -p, --path
+    -p, --path  [SUBDIRECTORY]
             Specify the subdirectory to archive to, appended to ARCHIVE_TARGET.
 
     -r, --rotation
