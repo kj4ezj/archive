@@ -425,7 +425,7 @@ for (( i=1; i <= $#; i++)); do
         exit-success
     else
         FILENAME="${!i}"
-        FILE_EXTENSION="$(echo "$FILENAME" | grep -oP '[.][a-zA-Z0-9]+$')"
+        FILE_EXTENSION="$(echo "$FILENAME" | grep -oP '[.][a-zA-Z0-9]+$' || :)"
         if [[ -z "$FILE_EXTENSION" ]]; then
             FILENAME="${FILENAME}.pdf"
         fi
