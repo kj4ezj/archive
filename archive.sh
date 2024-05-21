@@ -282,7 +282,7 @@ function merge-pdfs {
             PDFUNITE_CMD+=" '$BASE_PART_1'"
         fi
     elif [[ -f "$MERGED" && -f "$BASE_PART_1" && "$ARCHIVE_FORCE" == 'true' ]]; then # "--force" is set, overwrite existing output file
-        conditional-ee "rm '$MERGED'" || fail "ERROR: Failed to delete '$MERGED'! rm returned exit code '$?'." "$?"
+        conditional-ee "shred -uz '$MERGED'" || fail "ERROR: Failed to delete '$MERGED'! shred returned exit code '$?'." "$?"
     elif [[ -f "$MERGED" && -f "$BASE_PART_1" ]]; then
         fail "ERROR: Both '$MERGED' and '$BASE_PART_1' exist! Rename or delete one of them." 15
     fi
@@ -301,7 +301,7 @@ function merge-pdfs {
     # remove the parts after merging
     if [[ -z "$ARCHIVE_KEEP_LOCAL_COPY" ]]; then
         for PART in "${PARTS[@]}"; do
-            conditional-ee "rm '$PART'" || fail "ERROR: Failed to delete partial PDF '$PART' after merging! rm returned exit code '$?'." "$?"
+            conditional-ee "shred -uz '$PART'" || fail "ERROR: Failed to delete partial PDF '$PART' after merging! shred returned exit code '$?'." "$?"
         done
     else
         log 'Not deleting partial PDFs, "--keep" is set.'
@@ -325,7 +325,7 @@ function multi-page-pdf-util {
             elif [[ "$1" == 'split' ]]; then # split multi-page PDFs
                 conditional-ee "pdfseparate '$PDF_FILE' '${PDF_FILE%%.[pP][dD][fF]}_%d.pdf'" || fail "ERROR: Failed to split '$PDF_FILE'! pdfseparate returned exit code '$?'." "$?"
                 if [[ -z "$ARCHIVE_KEEP_LOCAL_COPY" ]]; then
-                    conditional-ee "rm '$PDF_FILE'" || fail "ERROR: Failed to delete '$PDF_FILE' after splitting! rm returned exit code '$?'." "$?"
+                    conditional-ee "shred -uz '$PDF_FILE'" || fail "ERROR: Failed to delete '$PDF_FILE' after splitting! shred returned exit code '$?'." "$?"
                 else
                     log 'Not deleting original PDF, "--keep" is set.'
                 fi
@@ -529,7 +529,7 @@ else
         printf "Press [Enter] to delete the local copy of '%s'..." "$FILENAME"
         [[ -n "$ARCHIVE_DRY_RUN" ]] && printf ' \e[1m\e[33m(DRY-RUN)\e[0m'
         read -rp ' '
-        conditional-ee "rm '$FILENAME'" || fail "ERROR: Failed to delete '$FILENAME'! rm returned exit code '$?'." "$?"
+        conditional-ee "shred -uz '$FILENAME'" || fail "ERROR: Failed to delete '$FILENAME'! shred returned exit code '$?'." "$?"
     else
         log 'Not deleting local copy, "--keep" is set.'
     fi
